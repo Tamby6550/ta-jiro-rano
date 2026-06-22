@@ -28,3 +28,13 @@ export function formatDate(iso: string | null | undefined): string {
   const d = new Date(iso);
   return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
 }
+
+/** Date « longue » en français avec le mois en toutes lettres : ex. "10 Juin 2026". */
+export function formatDateLong(iso: string | null | undefined): string {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  const parts = d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' }).split(' ');
+  if (parts.length < 3) return parts.join(' ');
+  const [day, month, year] = parts;
+  return `${day} ${month.charAt(0).toUpperCase()}${month.slice(1)} ${year}`;
+}

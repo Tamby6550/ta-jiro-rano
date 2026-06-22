@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { formatAriary, formatConsumption, formatPercent, formatDate } from '../core/format';
+import { formatAriary, formatConsumption, formatPercent, formatDate, formatDateLong } from '../core/format';
 import { Utility } from '../core/models';
 
 @Pipe({ name: 'ar', standalone: true })
@@ -27,5 +27,12 @@ export class PercentPipe implements PipeTransform {
 export class FDatePipe implements PipeTransform {
   transform(v: string | null | undefined): string {
     return formatDate(v);
+  }
+}
+
+@Pipe({ name: 'fdatelong', standalone: true })
+export class FDateLongPipe implements PipeTransform {
+  transform(v: string | null | undefined): string {
+    return formatDateLong(v);
   }
 }

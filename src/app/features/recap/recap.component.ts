@@ -4,8 +4,8 @@ import { PropertyStore } from '../../core/property.store';
 import { I18nService } from '../../core/i18n.service';
 import { PdfService } from '../../core/pdf.service';
 import { AllocationRow, Invoice } from '../../core/models';
-import { formatAriary, formatDate } from '../../core/format';
-import { AriaryPipe, FDatePipe } from '../../shared/format.pipes';
+import { formatAriary, formatDateLong } from '../../core/format';
+import { AriaryPipe, FDateLongPipe } from '../../shared/format.pipes';
 import { SpinnerComponent } from '../../shared/spinner.component';
 
 interface RecapRow { house_id: string; house: string; tenant: string | null; color: string | null; elec: number; water: number; total: number; }
@@ -13,7 +13,7 @@ interface RecapRow { house_id: string; house: string; tenant: string | null; col
 @Component({
   selector: 'tjr-recap',
   standalone: true,
-  imports: [AriaryPipe, FDatePipe, SpinnerComponent],
+  imports: [AriaryPipe, FDateLongPipe, SpinnerComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (loading()) { <tjr-spinner /> }
@@ -30,7 +30,7 @@ interface RecapRow { house_id: string; house: string; tenant: string | null; col
               @if (estimated()) { <span class="badge badge-warn" style="margin-left:6px">ESTIMÉE</span> }</div>
             <div class="muted">Montant à régler par maison ce mois-ci</div></div>
           @if (due()) { <div class="due"><span class="field-label" style="color:var(--elec-strong)">Date limite</span>
-            <div class="mono ddate">{{ due() | fdate }}</div></div> }
+            <div class="ddate">{{ due() | fdatelong }}</div></div> }
         </div>
 
         <div class="thead"><span>Maison</span><span class="r">⚡</span><span class="r">💧</span><span class="r">Total</span></div>
@@ -60,7 +60,7 @@ interface RecapRow { house_id: string; house: string; tenant: string | null; col
           }
           <div class="ann-line ann-total"><span>Total général</span><b class="mono">{{ grand() | ar }}</b></div>
           @if (estimated()) { <p class="ann-meta">⚠️ Facture estimée par JIRAMA (NR)</p> }
-          @if (due()) { <p class="ann-meta">📅 Date limite de paiement : <b>{{ due() | fdate }}</b></p> }
+          @if (due()) { <p class="ann-meta">📅 Date limite de paiement : <b>{{ due() | fdatelong }}</b></p> }
           @if (shareLink()) {
             <p class="ann-meta">🔗 Consulter le détail (sans connexion) :<br><span class="mono ann-url">{{ shareLink() }}</span></p>
           }
@@ -143,7 +143,7 @@ export class RecapComponent {
   message = computed(() => {
     const lines = this.rows().map((r) => `${r.tenant ?? r.house} : *${formatAriary(r.total)}*`).join('\n');
     const est = this.estimated() ? `\n⚠️ Facture estimée par JIRAMA (NR)` : '';
-    const d = this.due() ? `\n📅 Date limite de paiement : *${formatDate(this.due())}*` : '';
+    const d = this.due() ? `\n📅 Date limite de paiement : *${formatDateLong(this.due())}*` : '';
     const link = this.shareLink() ? `\n\n🔗 Consulter le détail (sans connexion) :\n${this.shareLink()}` : '';
     return `🏠 Bonjour à toutes et à tous !\nEAU + JIRO — ${this.store.currentMonth()}${est}\n\n${lines}\n\nTotal général : *${formatAriary(this.grand())}*${d}${link}\n\nMerci à tous 🙏`;
   });
