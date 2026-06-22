@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body { background: #eef0f4; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-thumb { background: #c9cfd9; border-radius: 6px; border: 2px solid transparent; background-clip: content-box; }
+  @keyframes tjrFade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  @keyframes tjrToast { from { opacity: 0; transform: translateY(14px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+  @keyframes tjrGrow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+  input:focus, button:focus { outline: none; }
+</style>
+</helmet>
+
+<div style="min-height:100vh; font-family:'IBM Plex Sans',system-ui,sans-serif; color:#161b24; background:#eef0f4; display:flex; flex-direction:column;">
+
+  <div style="display:flex; flex:1; min-height:100vh;">
+
+    <!-- ===================== SIDEBAR (desktop) ===================== -->
+    <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+    <aside style="width:248px; flex:none; background:#0e1626; color:#aeb7c6; display:flex; flex-direction:column; position:sticky; top:0; height:100vh;">
+      <div style="padding:22px 22px 18px; display:flex; align-items:center; gap:11px;">
+        <div style="width:38px; height:38px; border-radius:10px; background:linear-gradient(140deg,#f5a524 0 50%,#0fb5ad 50% 100%); display:flex; align-items:center; justify-content:center; flex:none; box-shadow:0 4px 14px rgba(0,0,0,.35);">
+          <span style="font-family:'Space Grotesk'; font-weight:700; font-size:17px; color:#0e1626;">TJ</span>
+        </div>
+        <div style="line-height:1.05;">
+          <div style="font-family:'Space Grotesk'; font-weight:700; font-size:15.5px; letter-spacing:.06em; color:#fff;">TA·JIRO·RANO</div>
+          <div style="font-size:10.5px; letter-spacing:.12em; text-transform:uppercase; color:#5d6a80; margin-top:3px;">{{ t.tagline }}</div>
+        </div>
+      </div>
+
+      <nav style="padding:8px 12px; display:flex; flex-direction:column; gap:3px;">
+        <button onClick="{{ goDash }}" style="{{ nav.dash.style }}"><span style="{{ nav.dash.dot }}"></span>{{ t.nav_dash }}</button>
+        <button onClick="{{ goSaisie }}" style="{{ nav.saisie.style }}"><span style="{{ nav.saisie.dot }}"></span>{{ t.nav_saisie }}</button>
+        <button onClick="{{ goFactures }}" style="{{ nav.factures.style }}"><span style="{{ nav.factures.dot }}"></span>{{ t.nav_factures }}</button>
+        <button onClick="{{ goRecap }}" style="{{ nav.recap.style }}"><span style="{{ nav.recap.dot }}"></span>{{ t.nav_recap }}</button>
+        <button onClick="{{ goMaisons }}" style="{{ nav.maisons.style }}"><span style="{{ nav.maisons.dot }}"></span>{{ t.nav_maisons }}</button>
+        <div style="height:1px; background:#1c2942; margin:10px 10px;"></div>
+        <button onClick="{{ goTenant }}" style="{{ nav.tenant.style }}"><span style="{{ nav.tenant.dot }}"></span>{{ t.nav_tenant }}</button>
+      </nav>
+
+      <div style="margin-top:auto; padding:16px;">
+        <div style="background:#142036; border:1px solid #1f2e49; border-radius:13px; padding:14px;">
+          <div style="font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:#5d6a80; margin-bottom:8px;">{{ t.period }}</div>
+          <div style="font-family:'Space Grotesk'; font-weight:600; font-size:16px; color:#fff;">{{ period }}</div>
+          <div style="display:flex; align-items:center; gap:7px; margin-top:10px;">
+            <span style="width:7px; height:7px; border-radius:50%; background:#34d399;"></span>
+            <span style="font-size:12px; color:#8b97ab;">{{ t.period_open }}</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+    </sc-if>
+
+    <!-- ===================== MAIN COLUMN ===================== -->
+    <div style="flex:1; min-width:0; display:flex; flex-direction:column;">
+
+      <!-- ===================== TOPBAR ===================== -->
+      <header style="{{ topbarStyle }}">
+        <div style="min-width:0;">
+          <div style="font-family:'Space Grotesk'; font-weight:700; font-size:{{ titleSize }}; letter-spacing:-.01em; color:#0e1626; line-height:1.1;">{{ screenTitle }}</div>
+          <div style="font-size:13px; color:#6b7689; margin-top:3px;">{{ screenSub }}</div>
+        </div>
+        <div style="display:flex; align-items:center; gap:10px; flex:none;">
+          <div style="display:flex; background:#eef0f4; border-radius:9px; padding:3px;">
+            <button onClick="{{ setFr }}" style="{{ langFrStyle }}">FR</button>
+            <button onClick="{{ setEn }}" style="{{ langEnStyle }}">EN</button>
+          </div>
+          <div style="display:flex; background:#eef0f4; border-radius:9px; padding:3px;">
+            <button onClick="{{ setAdmin }}" style="{{ roleAdminStyle }}">{{ t.role_admin }}</button>
+            <button onClick="{{ setTenant }}" style="{{ roleTenantStyle }}">{{ t.role_tenant }}</button>
+          </div>
+        </div>
+      </header>
+
+      <!-- ===================== SCROLL AREA ===================== -->
+      <main style="{{ mainStyle }}">
+
+        <!-- ========== DASHBOARD ========== -->
+        <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+        <div style="animation:tjrFade .4s ease both;">
+
+          <!-- dash variant switch -->
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+            <div style="display:flex; gap:8px;">
+              <button onClick="{{ setDashA }}" style="{{ dashAStyle }}">{{ t.dash_overview }}</button>
+              <button onClick="{{ setDashB }}" style="{{ dashBStyle }}">{{ t.dash_compare }}</button>
+            </div>
+            <button onClick="{{ goSaisie }}" style="display:inline-flex; align-items:center; gap:8px; background:#0e1626; color:#fff; border:none; border-radius:10px; padding:11px 16px; font-family:'IBM Plex Sans'; font-weight:600; font-size:13.5px; cursor:pointer;">＋ {{ t.new_reading }}</button>
+          </div>
+
+          <!-- KPI row -->
+          <div style="display:grid; grid-template-columns:{{ kpiCols }}; gap:16px; margin-bottom:18px;">
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:18px;">
+              <div style="font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:#8a95a6;">{{ t.kpi_total }}</div>
+              <div style="font-family:'JetBrains Mono'; font-weight:600; font-size:27px; color:#0e1626; margin-top:8px; letter-spacing:-.01em;">{{ kpi.total }}</div>
+              <div style="font-size:12.5px; color:#6b7689; margin-top:6px;">{{ kpi.totalDelta }}</div>
+            </div>
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:18px; position:relative; overflow:hidden;">
+              <div style="position:absolute; top:0; left:0; width:4px; height:100%; background:#f5a524;"></div>
+              <div style="font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:#8a95a6;">⚡ {{ t.elec }}</div>
+              <div style="font-family:'JetBrains Mono'; font-weight:600; font-size:27px; color:#0e1626; margin-top:8px;">{{ kpi.elec }}</div>
+              <div style="font-size:12.5px; color:#6b7689; margin-top:6px;">{{ kpi.elecKwh }}</div>
+            </div>
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:18px; position:relative; overflow:hidden;">
+              <div style="position:absolute; top:0; left:0; width:4px; height:100%; background:#0fb5ad;"></div>
+              <div style="font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:#8a95a6;">💧 {{ t.water }}</div>
+              <div style="font-family:'JetBrains Mono'; font-weight:600; font-size:27px; color:#0e1626; margin-top:8px;">{{ kpi.water }}</div>
+              <div style="font-size:12.5px; color:#6b7689; margin-top:6px;">{{ kpi.waterOcc }}</div>
+            </div>
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:18px;">
+              <div style="font-size:12px; letter-spacing:.05em; text-transform:uppercase; color:#8a95a6;">{{ t.kpi_loss }}</div>
+              <div style="font-family:'JetBrains Mono'; font-weight:600; font-size:27px; color:#b45309; margin-top:8px;">{{ kpi.loss }}</div>
+              <div style="font-size:12.5px; color:#6b7689; margin-top:6px;">{{ kpi.lossKwh }}</div>
+            </div>
+          </div>
+
+          <!-- VARIANT A : charts + repartition -->
+          <sc-if value="{{ isDashA }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:{{ dashAcols }}; gap:16px;">
+            <!-- monthly charts -->
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+                <div style="font-family:'Space Grotesk'; font-weight:600; font-size:16px;">{{ t.monthly }}</div>
+                <div style="display:flex; gap:14px; font-size:12px; color:#6b7689;">
+                  <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:9px; height:9px; border-radius:2px; background:#f5a524;"></span>{{ t.elec }}</span>
+                  <span style="display:inline-flex; align-items:center; gap:6px;"><span style="width:9px; height:9px; border-radius:2px; background:#0fb5ad;"></span>{{ t.water }}</span>
+                </div>
+              </div>
+              <div style="display:flex; align-items:flex-end; gap:10px; height:170px; padding-top:8px;">
+                <sc-for list="{{ months }}" as="m" hint-placeholder-count="6">
+                  <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end;">
+                    <div style="display:flex; align-items:flex-end; gap:4px; height:135px;">
+                      <div title="{{ m.elecVal }}" style="width:13px; background:#f5a524; border-radius:3px 3px 0 0; height:{{ m.elecH }}; transform-origin:bottom; animation:tjrGrow .6s ease both;"></div>
+                      <div title="{{ m.waterVal }}" style="width:13px; background:#0fb5ad; border-radius:3px 3px 0 0; height:{{ m.waterH }}; transform-origin:bottom; animation:tjrGrow .6s ease both;"></div>
+                    </div>
+                    <div style="font-size:11px; color:#8a95a6; font-weight:500;">{{ m.label }}</div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+
+            <!-- repartition snapshot -->
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px;">
+              <div style="font-family:'Space Grotesk'; font-weight:600; font-size:16px; margin-bottom:4px;">{{ t.repartition }}</div>
+              <div style="font-size:12.5px; color:#8a95a6; margin-bottom:16px;">{{ t.repartition_sub }}</div>
+              <div style="display:flex; flex-direction:column; gap:14px;">
+                <sc-for list="{{ elecRows }}" as="r" hint-placeholder-count="4">
+                  <div>
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:6px;">
+                      <span style="display:inline-flex; align-items:center; gap:8px; font-size:13.5px; font-weight:500;"><span style="width:10px; height:10px; border-radius:3px; background:{{ r.color }};"></span>{{ r.house }} · {{ r.tenant }}</span>
+                      <span style="font-family:'JetBrains Mono'; font-size:13px; font-weight:600;">{{ r.amount }}</span>
+                    </div>
+                    <div style="height:7px; background:#eef0f4; border-radius:4px; overflow:hidden;">
+                      <div style="height:100%; width:{{ r.barW }}; background:{{ r.color }}; border-radius:4px;"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+
+          <!-- VARIANT B : side-by-side utility panels -->
+          <sc-if value="{{ isDashB }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:{{ dashBcols }}; gap:16px;">
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:22px; border-top:3px solid #f5a524;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+                <div style="font-family:'Space Grotesk'; font-weight:600; font-size:17px;">⚡ {{ t.elec }}</div>
+                <span style="font-family:'JetBrains Mono'; font-size:13px; color:#b45309; background:#fff3e0; padding:4px 9px; border-radius:7px;">{{ kpi.elecKwh }}</span>
+              </div>
+              <div style="font-family:'JetBrains Mono'; font-weight:600; font-size:30px; margin-bottom:4px;">{{ kpi.elec }}</div>
+              <div style="font-size:12.5px; color:#6b7689; margin-bottom:18px;">{{ t.main_meter }} · {{ elecMain.range }}</div>
+              <div style="display:flex; flex-direction:column; gap:11px;">
+                <sc-for list="{{ elecRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="width:9px; height:9px; border-radius:3px; background:{{ r.color }}; flex:none;"></span>
+                    <span style="font-size:13px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.house }}</span>
+                    <span style="font-family:'JetBrains Mono'; font-size:12.5px; color:#6b7689;">{{ r.kwh }}</span>
+                    <span style="font-family:'JetBrains Mono'; font-size:13px; font-weight:600; width:96px; text-align:right;">{{ r.amount }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:22px; border-top:3px solid #0fb5ad;">
+              <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:18px;">
+                <div style="font-family:'Space Grotesk'; font-weight:600; font-size:17px;">💧 {{ t.water }}</div>
+                <span style="font-family:'JetBrains Mono'; font-size:13px; color:#0f766e; background:#e3f6f4; padding:4px 9px; border-radius:7px;">{{ kpi.waterOcc }}</span>
+              </div>
+              <div style="font-family:'JetBrains Mono'; font-weight:600; font-size:30px; margin-bottom:4px;">{{ kpi.water }}</div>
+              <div style="font-size:12.5px; color:#6b7689; margin-bottom:18px;">{{ t.per_person }} · {{ waterPerPerson }}</div>
+              <div style="display:flex; flex-direction:column; gap:11px;">
+                <sc-for list="{{ waterRows }}" as="r" hint-placeholder-count="4">
+                  <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="width:9px; height:9px; border-radius:3px; background:{{ r.color }}; flex:none;"></span>
+                    <span style="font-size:13px; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.house }}</span>
+                    <span style="font-family:'JetBrains Mono'; font-size:12.5px; color:#6b7689;">{{ r.occ }} pers.</span>
+                    <span style="font-family:'JetBrains Mono'; font-size:13px; font-weight:600; width:96px; text-align:right;">{{ r.amount }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+          </sc-if>
+
+        </div>
+        </sc-if>
+
+        <!-- ========== SAISIE DES INDEX ========== -->
+        <sc-if value="{{ isSaisie }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:tjrFade .4s ease both;">
+
+          <!-- form config bar -->
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px 22px; margin-bottom:16px;">
+            <div style="display:flex; gap:22px; flex-wrap:wrap; align-items:flex-end;">
+              <div style="min-width:180px;">
+                <label style="display:block; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:#9aa4b4; font-weight:600; margin-bottom:7px;">{{ t.form_month }}</label>
+                <div style="position:relative;">
+                  <select value="{{ saisieMonth }}" onChange="{{ onMonthChange }}" style="appearance:none; width:100%; font-family:'IBM Plex Sans'; font-weight:600; font-size:14.5px; padding:11px 38px 11px 14px; border:1.5px solid #d8dde6; border-radius:10px; background:#fff; color:#0e1626; cursor:pointer;" style-focus="border-color:#0e1626;">
+                    <sc-for list="{{ saisieMonths }}" as="m" hint-placeholder-count="6">
+                      <option value="{{ m }}">{{ m }}</option>
+                    </sc-for>
+                  </select>
+                  <span style="position:absolute; right:14px; top:50%; transform:translateY(-50%); pointer-events:none; color:#9aa4b4; font-size:12px;">▾</span>
+                </div>
+              </div>
+              <div>
+                <label style="display:block; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:#9aa4b4; font-weight:600; margin-bottom:7px;">{{ t.form_utility }}</label>
+                <div style="display:flex; gap:8px;">
+                  <button onClick="{{ setSaisieElec }}" style="{{ saisieElecTab }}">⚡ {{ t.elec }}</button>
+                  <button onClick="{{ setSaisieWater }}" style="{{ saisieWaterTab }}">💧 {{ t.water }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- main meter index entry -->
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px 22px; margin-bottom:16px; border-left:4px solid {{ saisieAccent }};">
+            <div style="display:flex; align-items:center; gap:10px; margin-bottom:16px;">
+              <span style="width:32px; height:32px; border-radius:9px; background:{{ saisieAccent }}1f; display:flex; align-items:center; justify-content:center; font-size:15px;">{{ saisieIcon }}</span>
+              <div style="font-family:'Space Grotesk'; font-weight:600; font-size:15px;">{{ t.main_meter_idx }}</div>
+            </div>
+            <div style="display:flex; gap:18px; flex-wrap:wrap; align-items:flex-end;">
+              <div>
+                <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#aab2c0; margin-bottom:6px;">{{ t.old_index }}</label>
+                <input value="{{ mainOldVal }}" onInput="{{ mainOnOld }}" inputMode="numeric" style="width:140px; font-family:'JetBrains Mono'; font-size:15px; font-weight:600; padding:10px 12px; border:1.5px solid #d8dde6; border-radius:9px; background:#fff; color:#0e1626;" style-focus="border-color:#0e1626; box-shadow:0 0 0 3px rgba(14,22,38,.1);" />
+              </div>
+              <span style="font-size:20px; color:#c0c7d2; padding-bottom:9px;">→</span>
+              <div>
+                <label style="display:block; font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#aab2c0; margin-bottom:6px;">{{ t.new_index }}</label>
+                <input value="{{ mainNewVal }}" onInput="{{ mainOnNew }}" inputMode="numeric" style="width:140px; font-family:'JetBrains Mono'; font-size:15px; font-weight:600; padding:10px 12px; border:1.5px solid #d8dde6; border-radius:9px; background:#fff; color:#0e1626;" style-focus="border-color:{{ saisieAccent }}; box-shadow:0 0 0 3px rgba(245,165,36,.15);" />
+              </div>
+              <div style="margin-left:auto; text-align:right;">
+                <div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#aab2c0; margin-bottom:6px;">{{ t.total_consumed }}</div>
+                <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:22px; color:{{ saisieAccent }};">{{ mainConsumed }}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- water mode: occupant note -->
+          <sc-if value="{{ saisieIsElec }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; overflow:hidden;">
+            <div style="padding:16px 22px; border-bottom:1px solid #eef0f4; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+              <div style="font-family:'Space Grotesk'; font-weight:600; font-size:15.5px;">{{ t.sub_meters_idx }} · {{ saisieMonth }}</div>
+              <span style="font-family:'JetBrains Mono'; font-size:12.5px; color:#6b7689; background:#eef0f4; padding:6px 11px; border-radius:8px;">{{ t.live_calc }}</span>
+            </div>
+
+            <!-- header row (desktop) -->
+            <sc-if value="{{ showSidebar }}" hint-placeholder-val="{{ true }}">
+            <div style="display:grid; grid-template-columns:1.6fr 1fr 1fr 1fr 1.1fr; gap:14px; padding:12px 22px; background:#fafbfc; border-bottom:1px solid #eef0f4; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:#9aa4b4; font-weight:600;">
+              <div>{{ t.house }}</div><div>{{ t.old_index }}</div><div>{{ t.new_index }}</div><div>{{ t.consumption }}</div><div>{{ t.proof }}</div>
+            </div>
+            </sc-if>
+
+            <sc-for list="{{ saisieRows }}" as="r" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:{{ saisieGrid }}; gap:14px; padding:16px 22px; border-bottom:1px solid #f3f5f8; align-items:center;">
+              <div style="display:flex; align-items:center; gap:11px;">
+                <span style="width:34px; height:34px; border-radius:9px; background:{{ r.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:15px; flex:none;">{{ r.initial }}</span>
+                <div style="min-width:0;">
+                  <div style="font-weight:600; font-size:13.5px;">{{ r.house }}</div>
+                  <div style="font-size:12px; color:#8a95a6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.tenant }}</div>
+                </div>
+              </div>
+              <div style="font-family:'JetBrains Mono'; font-size:14px; color:#6b7689;"><span style="font-size:10px; color:#aab2c0; display:block; text-transform:uppercase; letter-spacing:.05em;">{{ t.old_index }}</span>{{ r.oldI }}</div>
+              <div>
+                <span style="font-size:10px; color:#aab2c0; display:block; text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px;">{{ t.new_index }}</span>
+                <input value="{{ r.value }}" onInput="{{ r.onInput }}" inputMode="numeric" style="width:100%; max-width:120px; font-family:'JetBrains Mono'; font-size:15px; font-weight:600; padding:9px 11px; border:1.5px solid #d8dde6; border-radius:9px; background:#fff; color:#0e1626;" style-focus="border-color:#f5a524; box-shadow:0 0 0 3px rgba(245,165,36,.15);" />
+              </div>
+              <div style="font-family:'JetBrains Mono'; font-size:15px; font-weight:600; color:#b45309;"><span style="font-size:10px; color:#aab2c0; display:block; text-transform:uppercase; letter-spacing:.05em;">{{ t.consumption }}</span>{{ r.kwh }}</div>
+              <div>
+                <button onClick="{{ validateSaisie }}" style="display:inline-flex; align-items:center; gap:7px; border:1.5px dashed #cfd5de; background:#fafbfc; color:#7b8698; border-radius:9px; padding:9px 12px; font-size:12.5px; font-weight:500; cursor:pointer; font-family:'IBM Plex Sans';" style-hover="border-color:#f5a524; color:#b45309;">📷 {{ t.add_photo }}</button>
+              </div>
+            </div>
+            </sc-for>
+
+            <div style="padding:18px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:14px; background:#fafbfc;">
+              <div style="display:flex; gap:26px; flex-wrap:wrap;">
+                <div><div style="font-size:11.5px; color:#8a95a6; text-transform:uppercase; letter-spacing:.05em;">{{ t.sub_total }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:17px;">{{ saisieSub }}</div></div>
+                <div><div style="font-size:11.5px; color:#8a95a6; text-transform:uppercase; letter-spacing:.05em;">{{ t.main_total }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:17px;">{{ saisieMain }}</div></div>
+                <sc-if value="{{ saisieDiffPositive }}" hint-placeholder-val="{{ true }}">
+                <div><div style="font-size:11.5px; color:#b45309; text-transform:uppercase; letter-spacing:.05em;">{{ t.diff_detected }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:17px; color:#b45309;">{{ saisieDiff }}</div></div>
+                </sc-if>
+              </div>
+              <button onClick="{{ validateSaisie }}" style="background:#0e1626; color:#fff; border:none; border-radius:11px; padding:13px 22px; font-family:'IBM Plex Sans'; font-weight:600; font-size:14px; cursor:pointer;" style-hover="background:#1b2942;">{{ t.validate }}</button>
+            </div>
+          </div>
+          <div style="margin-top:14px; font-size:12.5px; color:#8a95a6; display:flex; align-items:flex-start; gap:8px;"><span>ℹ️</span><span style="max-width:760px;">{{ t.diff_detected }} → {{ t.network_loss }} {{ t.redistributed }}. {{ t.how_elec }}</span></div>
+          </sc-if>
+
+          <!-- water mode: occupants -->
+          <sc-if value="{{ saisieIsWater }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; overflow:hidden;">
+            <div style="padding:16px 22px; border-bottom:1px solid #eef0f4; font-family:'Space Grotesk'; font-weight:600; font-size:15.5px;">{{ t.occupants }} · {{ saisieMonth }}</div>
+            <div style="padding:14px 22px; font-size:13px; color:#5a6577; background:#e3f6f4; border-bottom:1px solid #eef0f4; display:flex; align-items:flex-start; gap:8px;"><span>💧</span><span style="max-width:780px;">{{ t.occ_water_note }}</span></div>
+            <sc-for list="{{ saisieRows }}" as="r" hint-placeholder-count="4">
+            <div style="display:flex; align-items:center; gap:13px; padding:14px 22px; border-bottom:1px solid #f3f5f8;">
+              <span style="width:34px; height:34px; border-radius:9px; background:{{ r.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:15px; flex:none;">{{ r.initial }}</span>
+              <div style="flex:1; min-width:0;"><div style="font-weight:600; font-size:13.5px;">{{ r.house }}</div><div style="font-size:12px; color:#8a95a6;">{{ r.tenant }}</div></div>
+              <span style="font-family:'JetBrains Mono'; font-size:15px; font-weight:600;">{{ r.occ }} <span style="font-size:12px; color:#8a95a6; font-weight:400;">pers.</span></span>
+            </div>
+            </sc-for>
+            <div style="padding:16px 22px; display:flex; align-items:center; justify-content:space-between; background:#fafbfc;">
+              <div><div style="font-size:11.5px; color:#8a95a6; text-transform:uppercase; letter-spacing:.05em;">{{ t.total_occ_label }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:17px;">{{ saisieTotalOcc }} pers.</div></div>
+              <button onClick="{{ validateSaisie }}" style="background:#0e1626; color:#fff; border:none; border-radius:11px; padding:13px 22px; font-family:'IBM Plex Sans'; font-weight:600; font-size:14px; cursor:pointer;" style-hover="background:#1b2942;">{{ t.validate }}</button>
+            </div>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ========== FACTURES ========== -->
+        <sc-if value="{{ isFactures }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:tjrFade .4s ease both;">
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; overflow:hidden;">
+            <sc-for list="{{ invoices }}" as="inv" hint-placeholder-count="6">
+            <div onClick="{{ inv.open }}" style="display:flex; align-items:center; gap:16px; padding:16px 22px; border-bottom:1px solid #f3f5f8; cursor:pointer;" style-hover="background:#fafbfc;">
+              <span style="width:42px; height:42px; border-radius:11px; background:{{ inv.accent }}1f; display:flex; align-items:center; justify-content:center; font-size:19px; flex:none;">{{ inv.icon }}</span>
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:600; font-size:14px;">{{ inv.type }} · {{ inv.period }}</div>
+                <div style="font-family:'JetBrains Mono'; font-size:12px; color:#8a95a6; margin-top:2px;">{{ inv.no }}</div>
+              </div>
+              <div style="font-family:'JetBrains Mono'; font-weight:600; font-size:15px; text-align:right;">{{ inv.amount }}</div>
+              <span style="font-size:12px; font-weight:600; padding:5px 11px; border-radius:20px; background:{{ inv.stBg }}; color:{{ inv.stColor }}; flex:none; width:84px; text-align:center;">{{ inv.status }}</span>
+              <span style="color:#c0c7d2; font-size:18px; flex:none;">›</span>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ========== DÉTAIL FACTURE ========== -->
+        <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:tjrFade .4s ease both;">
+          <div style="display:flex; align-items:center; gap:14px; margin-bottom:18px; flex-wrap:wrap;">
+            <button onClick="{{ backToFactures }}" style="border:1px solid #e6e9ef; background:#fff; border-radius:9px; padding:9px 14px; font-size:13px; font-weight:500; cursor:pointer; font-family:'IBM Plex Sans'; color:#5a6577;">‹ {{ t.nav_factures }}</button>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button onClick="{{ setDetailBoth }}" style="{{ detailBothTab }}">⚡💧 {{ t.both }}</button>
+              <button onClick="{{ setDetailElec }}" style="{{ detailElecTab }}">⚡ {{ t.elec }}</button>
+              <button onClick="{{ setDetailWater }}" style="{{ detailWaterTab }}">💧 {{ t.water }}</button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:{{ dashBcols }}; gap:16px; margin-bottom:16px;">
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:22px; border-top:3px solid {{ detail.accent }};">
+              <div style="display:flex; align-items:center; gap:11px; margin-bottom:18px;">
+                <span style="width:40px; height:40px; border-radius:10px; background:{{ detail.accent }}1f; display:flex; align-items:center; justify-content:center; font-size:19px;">{{ detail.icon }}</span>
+                <div><div style="font-family:'Space Grotesk'; font-weight:700; font-size:18px;">{{ detail.label }} · {{ period }}</div><div style="font-family:'JetBrains Mono'; font-size:12.5px; color:#8a95a6;">{{ detail.no }}</div></div>
+              </div>
+              <sc-if value="{{ detail.showSplit }}" hint-placeholder-val="{{ true }}">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">{{ t.bill_date }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:15px; margin-top:3px;">{{ detail.date }}</div></div>
+                <div><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">{{ t.due_date }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:15px; margin-top:3px;">{{ detail.due }}</div></div>
+              </div>
+              </sc-if>
+              <sc-if value="{{ detail.isBoth }}" hint-placeholder-val="{{ false }}">
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+                <div style="border-left:3px solid #f5a524; padding-left:11px;">
+                  <div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#b45309; font-weight:600;">⚡ {{ t.elec }}</div>
+                  <div style="font-family:'JetBrains Mono'; font-size:12.5px; color:#6b7689; margin-top:4px;">{{ detail.elecNo }}</div>
+                  <div style="font-size:11.5px; color:#9aa4b4; margin-top:3px;">{{ t.due_date }} · {{ detail.elecDue }}</div>
+                </div>
+                <div style="border-left:3px solid #0fb5ad; padding-left:11px;">
+                  <div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#0f766e; font-weight:600;">💧 {{ t.water }}</div>
+                  <div style="font-family:'JetBrains Mono'; font-size:12.5px; color:#6b7689; margin-top:4px;">{{ detail.waterNo }}</div>
+                  <div style="font-size:11.5px; color:#9aa4b4; margin-top:3px;">{{ t.due_date }} · {{ detail.waterDue }}</div>
+                </div>
+              </div>
+              </sc-if>
+            </div>
+            <div style="background:#0e1626; color:#fff; border-radius:16px; padding:22px; display:flex; flex-direction:column; justify-content:space-between;">
+              <div>
+                <div style="font-size:12px; text-transform:uppercase; letter-spacing:.07em; color:#7b8698;">{{ t.total_bill }}</div>
+                <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:32px; margin-top:8px;">{{ detail.total }}</div>
+              </div>
+              <button onClick="{{ genPdf }}" style="margin-top:18px; background:{{ detail.accent }}; color:#0e1626; border:none; border-radius:11px; padding:13px; font-family:'IBM Plex Sans'; font-weight:700; font-size:14px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px;">⬇ {{ t.generate_pdf }}</button>
+            </div>
+          </div>
+
+          <!-- repartition table (élec / eau) -->
+          <sc-if value="{{ detail.showSplit }}" hint-placeholder-val="{{ true }}">
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; overflow:hidden;">
+            <div style="padding:16px 22px; border-bottom:1px solid #eef0f4; font-family:'Space Grotesk'; font-weight:600; font-size:15.5px;">{{ t.repartition }}</div>
+            <div style="display:grid; grid-template-columns:{{ detailGrid }}; gap:12px; padding:11px 22px; background:#fafbfc; border-bottom:1px solid #eef0f4; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:#9aa4b4; font-weight:600;">
+              <div>{{ t.house }}</div><div style="text-align:right;">{{ detail.metricLabel }}</div><div style="text-align:right;">{{ t.share }}</div><div style="text-align:right;">{{ t.amount_due }}</div>
+            </div>
+            <sc-for list="{{ detail.rows }}" as="r" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:{{ detailGrid }}; gap:12px; padding:14px 22px; border-bottom:1px solid #f3f5f8; align-items:center;">
+              <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                <span style="width:10px; height:10px; border-radius:3px; background:{{ r.color }}; flex:none;"></span>
+                <div style="min-width:0;"><div style="font-weight:600; font-size:13.5px;">{{ r.house }}</div><div style="font-size:12px; color:#8a95a6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.tenant }}</div></div>
+              </div>
+              <div style="font-family:'JetBrains Mono'; font-size:13.5px; text-align:right; color:#6b7689;">{{ r.metric }}</div>
+              <div style="text-align:right;"><span style="font-family:'JetBrains Mono'; font-size:13px; background:#eef0f4; padding:3px 9px; border-radius:7px;">{{ r.pct }}</span></div>
+              <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px;">
+                <span style="font-family:'JetBrains Mono'; font-size:15px; font-weight:600;">{{ r.amount }}</span>
+                <button onClick="{{ r.open }}" style="border:1px solid #d8dde6; background:#fff; color:#5a6577; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; font-family:'IBM Plex Sans'; white-space:nowrap; flex:none;" style-hover="border-color:#0e1626; color:#0e1626;">⤢ {{ t.see_closer }}</button>
+              </div>
+            </div>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <!-- repartition table (combiné élec + eau) -->
+          <sc-if value="{{ detail.isBoth }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; overflow:hidden;">
+            <div style="padding:16px 22px; border-bottom:1px solid #eef0f4; font-family:'Space Grotesk'; font-weight:600; font-size:15.5px;">{{ t.recap_combined }}</div>
+            <div style="display:grid; grid-template-columns:1.5fr .9fr .9fr 1.7fr; gap:12px; padding:11px 22px; background:#fafbfc; border-bottom:1px solid #eef0f4; font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; color:#9aa4b4; font-weight:600;">
+              <div>{{ t.house }}</div><div style="text-align:right;">⚡ {{ t.elec }}</div><div style="text-align:right;">💧 {{ t.water }}</div><div style="text-align:right;">{{ t.amount_due }}</div>
+            </div>
+            <sc-for list="{{ detail.rows }}" as="r" hint-placeholder-count="4">
+            <div style="display:grid; grid-template-columns:1.5fr .9fr .9fr 1.7fr; gap:12px; padding:14px 22px; border-bottom:1px solid #f3f5f8; align-items:center;">
+              <div style="display:flex; align-items:center; gap:10px; min-width:0;">
+                <span style="width:10px; height:10px; border-radius:3px; background:{{ r.color }}; flex:none;"></span>
+                <div style="min-width:0;"><div style="font-weight:600; font-size:13.5px;">{{ r.house }}</div><div style="font-size:12px; color:#8a95a6; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.tenant }}</div></div>
+              </div>
+              <div style="font-family:'JetBrains Mono'; font-size:13px; text-align:right; color:#b45309;">{{ r.elecAmt }}</div>
+              <div style="font-family:'JetBrains Mono'; font-size:13px; text-align:right; color:#0f766e;">{{ r.waterAmt }}</div>
+              <div style="display:flex; align-items:center; justify-content:flex-end; gap:12px;">
+                <span style="font-family:'JetBrains Mono'; font-size:15px; font-weight:600;">{{ r.amount }}</span>
+                <button onClick="{{ r.open }}" style="border:1px solid #d8dde6; background:#fff; color:#5a6577; border-radius:8px; padding:6px 10px; font-size:12px; font-weight:600; cursor:pointer; font-family:'IBM Plex Sans'; white-space:nowrap; flex:none;" style-hover="border-color:#0e1626; color:#0e1626;">⤢ {{ t.see_closer }}</button>
+              </div>
+            </div>
+            </sc-for>
+          </div>
+          </sc-if>
+
+          <!-- elec breakdown / water breakdown -->
+          <sc-if value="{{ detail.isElec }}" hint-placeholder-val="{{ true }}">
+          <div style="display:grid; grid-template-columns:{{ kpiCols }}; gap:14px; margin-top:16px;">
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">{{ t.sub_meters_total }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px; margin-top:6px;">{{ detail.sumSub }}</div></div>
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">{{ t.main_total }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px; margin-top:6px;">{{ detail.mainKwh }}</div></div>
+            <div style="background:#fff3e0; border:1px solid #f6dcb0; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#b45309;">{{ t.network_loss }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px; margin-top:6px; color:#b45309;">{{ detail.loss }}</div></div>
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">{{ t.effective_rate }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:16px; margin-top:6px;">{{ detail.rate }}</div></div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ detail.isWater }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid; grid-template-columns:{{ dashBcols }}; gap:14px; margin-top:16px;">
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">{{ t.total_occ }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px; margin-top:6px;">{{ detail.totalOcc }}</div></div>
+            <div style="background:#e3f6f4; border:1px solid #b6e7e2; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#0f766e;">{{ t.per_person }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px; margin-top:6px; color:#0f766e;">{{ detail.per }}</div></div>
+          </div>
+          </sc-if>
+          <sc-if value="{{ detail.isBoth }}" hint-placeholder-val="{{ false }}">
+          <div style="display:grid; grid-template-columns:{{ dashBcols }}; gap:14px; margin-top:16px;">
+            <div style="background:#fff3e0; border:1px solid #f6dcb0; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#b45309;">⚡ {{ t.elec }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px; margin-top:6px; color:#b45309;">{{ detail.elecTotal }}</div></div>
+            <div style="background:#e3f6f4; border:1px solid #b6e7e2; border-radius:14px; padding:16px;"><div style="font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; color:#0f766e;">💧 {{ t.water }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:19px; margin-top:6px; color:#0f766e;">{{ detail.waterTotal }}</div></div>
+          </div>
+          </sc-if>
+
+          <div style="margin-top:14px; font-size:12.5px; color:#8a95a6; display:flex; align-items:flex-start; gap:8px;"><span>ℹ️</span><span style="max-width:760px;">{{ detail.how }}</span></div>
+
+          <!-- formule de calcul (électricité) -->
+          <sc-if value="{{ detail.showFormula }}" hint-placeholder-val="{{ false }}">
+          <div style="background:#0e1626; border-radius:16px; padding:24px; margin-top:16px; color:#e7ecf3;">
+            <div style="font-family:'Space Grotesk'; font-weight:600; font-size:16px; color:#fff;">{{ t.calc_title }}</div>
+            <div style="font-size:12.5px; color:#8b97ab; margin-top:3px; margin-bottom:20px;">{{ t.calc_sub }}</div>
+            <div style="display:flex; flex-direction:column; gap:14px;">
+              <sc-for list="{{ elecFormulas }}" as="f" hint-placeholder-count="5">
+                <div style="display:flex; align-items:flex-start; gap:14px;">
+                  <span style="width:26px; height:26px; border-radius:7px; background:#f5a524; color:#0e1626; font-family:'Space Grotesk'; font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center; flex:none;">{{ f.n }}</span>
+                  <div style="min-width:0;">
+                    <div style="font-size:11px; color:#8b97ab; text-transform:uppercase; letter-spacing:.06em;">{{ f.label }}</div>
+                    <div style="font-family:'JetBrains Mono'; font-size:14.5px; color:#fff; margin-top:5px; word-break:break-word;">{{ f.f }}</div>
+                  </div>
+                </div>
+              </sc-for>
+            </div>
+            <div style="margin-top:18px; padding-top:15px; border-top:1px solid #1f2e49; font-size:12.5px; color:#8b97ab; display:flex; align-items:flex-start; gap:8px;"><span>ℹ️</span><span style="max-width:760px;">{{ t.calc_note }}</span></div>
+          </div>
+          </sc-if>
+        </div>
+        </sc-if>
+
+        <!-- ========== RÉCAPITULATIF ========== -->
+        <sc-if value="{{ isRecap }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:tjrFade .4s ease both;">
+          <div style="display:grid; grid-template-columns:{{ recapCols }}; gap:16px;">
+
+            <!-- breakdown -->
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; overflow:hidden; align-self:start;">
+              <div style="padding:18px 22px; border-bottom:1px solid #eef0f4; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+                <div style="min-width:0;">
+                  <div style="font-family:'Space Grotesk'; font-weight:700; font-size:21px; letter-spacing:-.01em;">{{ t.recap_combined }} · {{ period }}</div>
+                  <div style="font-size:12.5px; color:#8a95a6; margin-top:3px;">{{ t.recap_intro }}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; background:#fff3e0; border:1px solid #f6dcb0; border-radius:11px; padding:9px 13px; flex:none;">
+                  <span style="font-size:19px; line-height:1;">⏰</span>
+                  <div>
+                    <div style="font-size:10px; letter-spacing:.05em; text-transform:uppercase; color:#b45309; font-weight:600;">{{ t.deadline }}</div>
+                    <div style="font-family:'Space Grotesk'; font-weight:700; font-size:15px; color:#9a3412; margin-top:1px;">{{ recapDeadline }}</div>
+                  </div>
+                </div>
+              </div>
+              <div style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:10px; padding:11px 22px; background:#fafbfc; border-bottom:1px solid #eef0f4; font-size:11px; letter-spacing:.04em; text-transform:uppercase; color:#9aa4b4; font-weight:600;">
+                <div>{{ t.house }}</div><div style="text-align:right;">⚡</div><div style="text-align:right;">💧</div><div style="text-align:right;">Total</div>
+              </div>
+              <sc-for list="{{ recapRows }}" as="r" hint-placeholder-count="4">
+              <div style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr; gap:10px; padding:13px 22px; border-bottom:1px solid #f3f5f8; align-items:center;">
+                <div style="display:flex; align-items:center; gap:9px; min-width:0;"><span style="width:9px; height:9px; border-radius:3px; background:{{ r.color }}; flex:none;"></span><div style="min-width:0;"><div style="font-weight:600; font-size:13px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ r.name }}</div><div style="font-size:11.5px; color:#9aa4b4;">{{ r.house }}</div></div></div>
+                <div style="font-family:'JetBrains Mono'; font-size:12px; text-align:right; color:#6b7689;">{{ r.elecAmt }}</div>
+                <div style="font-family:'JetBrains Mono'; font-size:12px; text-align:right; color:#6b7689;">{{ r.waterAmt }}</div>
+                <div style="font-family:'JetBrains Mono'; font-size:14px; font-weight:600; text-align:right;">{{ r.total }}</div>
+              </div>
+              </sc-for>
+              <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:16px 22px; background:#0e1626; color:#fff;">
+                <button onClick="{{ openDetailBoth }}" style="display:inline-flex; align-items:center; gap:6px; background:transparent; border:1px solid #33415c; color:#cdd5e2; border-radius:9px; padding:9px 13px; font-family:'IBM Plex Sans'; font-weight:600; font-size:12.5px; cursor:pointer;" style-hover="background:#1b2942; border-color:#4a5a78;">{{ t.view_details }} →</button>
+                <div style="display:flex; align-items:baseline; gap:10px;">
+                  <span style="font-size:13px; color:#aeb7c6;">{{ t.grand_total }}</span>
+                  <span style="font-family:'JetBrains Mono'; font-weight:700; font-size:20px;">{{ recapGrand }}</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- announcement bubble -->
+            <div>
+              <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:18px;">
+                <div style="display:flex; align-items:center; gap:9px; margin-bottom:14px;">
+                  <span style="width:30px; height:30px; border-radius:8px; background:linear-gradient(140deg,#f5a524 0 50%,#0fb5ad 50% 100%); flex:none;"></span>
+                  <div style="font-family:'Space Grotesk'; font-weight:600; font-size:14px;">{{ t.recap_title }}</div>
+                </div>
+                <div style="background:#f2f7f3; border:1px solid #e1ebe4; border-radius:14px; border-top-left-radius:4px; padding:16px; font-size:13.5px; line-height:1.55; color:#1f2a22;">
+                  <div style="font-weight:600; margin-bottom:3px;">🏠 {{ t.recap_greeting }}</div>
+                  <div style="font-size:12.5px; color:#5a6b5f; margin-bottom:12px;">{{ t.recap_combined }} — {{ period }}</div>
+                  <sc-for list="{{ recapRows }}" as="r" hint-placeholder-count="4">
+                    <div style="display:flex; justify-content:space-between; gap:12px; padding:3px 0; border-bottom:1px dotted #d6e0d9;"><span style="font-weight:600;">{{ r.name }}</span><span style="font-family:'JetBrains Mono'; font-weight:600;">{{ r.amt }}</span></div>
+                  </sc-for>
+                  <div style="margin-top:12px; font-size:12px; color:#5a6b5f;">NB : {{ t.recap_nb }} — Ariary.</div>
+                  <div style="margin-top:12px; background:#fff3e0; border:1px solid #f6dcb0; border-radius:11px; padding:12px 14px; display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:22px; line-height:1;">⏰</span>
+                    <div>
+                      <div style="font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:#b45309; font-weight:600;">{{ t.deadline }}</div>
+                      <div style="font-family:'Space Grotesk'; font-weight:700; font-size:19px; color:#9a3412; margin-top:2px;">{{ recapDeadline }}</div>
+                    </div>
+                  </div>
+                  <div style="margin-top:10px;">Merci à tous 🎉</div>
+                </div>
+                <button onClick="{{ copyAnnounce }}" style="width:100%; margin-top:14px; background:#0e1626; color:#fff; border:none; border-radius:11px; padding:13px; font-family:'IBM Plex Sans'; font-weight:600; font-size:13.5px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px;" style-hover="background:#1b2942;">⧉ {{ t.copy_msg }}</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ========== MAISONS & LOCATAIRES ========== -->
+        <sc-if value="{{ isMaisons }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:tjrFade .4s ease both;">
+          <div style="display:flex; justify-content:flex-end; margin-bottom:16px;">
+            <button onClick="{{ addHouse }}" style="background:#0e1626; color:#fff; border:none; border-radius:10px; padding:11px 16px; font-family:'IBM Plex Sans'; font-weight:600; font-size:13.5px; cursor:pointer;">＋ {{ t.add_house }}</button>
+          </div>
+          <div style="display:grid; grid-template-columns:{{ maisonsCols }}; gap:16px;">
+            <sc-for list="{{ houseCards }}" as="h" hint-placeholder-count="4">
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px;">
+              <div style="display:flex; align-items:center; gap:13px; margin-bottom:18px;">
+                <span style="width:46px; height:46px; border-radius:12px; background:{{ h.color }}; color:#fff; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:20px; flex:none;">{{ h.initial }}</span>
+                <div style="flex:1; min-width:0;">
+                  <div style="font-family:'Space Grotesk'; font-weight:600; font-size:16px;">{{ h.name }}</div>
+                  <div style="font-size:13px; color:#6b7689;">{{ h.tenant }}</div>
+                </div>
+                <span style="font-size:11.5px; color:#9aa4b4; background:#f3f5f8; padding:4px 9px; border-radius:7px;">{{ h.lot }}</span>
+              </div>
+              <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding-top:16px; border-top:1px solid #f3f5f8;">
+                <div><div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">{{ t.occupants }}</div><div style="font-family:'JetBrains Mono'; font-weight:600; font-size:18px; margin-top:4px;">{{ h.occ }}</div></div>
+                <div><div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">⚡ {{ t.sub_meter }}</div><div style="font-family:'JetBrains Mono'; font-weight:500; font-size:13px; margin-top:6px; color:#6b7689;">{{ h.elecMeter }}</div></div>
+                <div><div style="font-size:11px; text-transform:uppercase; letter-spacing:.05em; color:#9aa4b4;">💧 {{ t.sub_meter }}</div><div style="font-family:'JetBrains Mono'; font-weight:500; font-size:13px; margin-top:6px; color:#6b7689;">{{ h.waterMeter }}</div></div>
+              </div>
+            </div>
+            </sc-for>
+          </div>
+        </div>
+        </sc-if>
+
+        <!-- ========== ESPACE LOCATAIRE ========== -->
+        <sc-if value="{{ isTenant }}" hint-placeholder-val="{{ false }}">
+        <div style="animation:tjrFade .4s ease both;">
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:18px;">
+            <span style="font-size:12.5px; color:#8a95a6;">{{ t.select_house }}:</span>
+            <sc-for list="{{ tenantSwitch }}" as="h" hint-placeholder-count="4">
+              <button onClick="{{ h.onClick }}" style="{{ h.style }}">{{ h.name }}</button>
+            </sc-for>
+          </div>
+
+          <div style="background:#0e1626; color:#fff; border-radius:18px; padding:26px; margin-bottom:16px; position:relative; overflow:hidden;">
+            <div style="position:absolute; right:-30px; top:-30px; width:160px; height:160px; border-radius:50%; background:{{ tenantData.color }}26;"></div>
+            <div style="display:flex; align-items:center; gap:14px; margin-bottom:22px; position:relative;">
+              <span style="width:52px; height:52px; border-radius:14px; background:{{ tenantData.color }}; color:#0e1626; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:22px;">{{ tenantData.name }}</span>
+              <div><div style="font-size:12.5px; color:#7b8698;">{{ tenantData.tenant }}</div><div style="font-family:'Space Grotesk'; font-weight:700; font-size:20px;">{{ tenantData.name }} · {{ period }}</div></div>
+            </div>
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:16px; position:relative;">
+              <div>
+                <div style="font-size:12px; text-transform:uppercase; letter-spacing:.07em; color:#7b8698;">{{ t.your_total }}</div>
+                <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:34px; margin-top:6px;">{{ tenantData.total }}</div>
+              </div>
+              <button onClick="{{ tenantDownload }}" style="background:{{ tenantData.color }}; color:#0e1626; border:none; border-radius:11px; padding:12px 18px; font-family:'IBM Plex Sans'; font-weight:700; font-size:13.5px; cursor:pointer;">⬇ {{ t.download_pdf }}</button>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:{{ dashBcols }}; gap:16px; margin-bottom:16px;">
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px; border-left:4px solid #f5a524;">
+              <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:13px; color:#6b7689;">⚡ {{ t.your_elec }}</span><span style="font-family:'JetBrains Mono'; font-size:12px; color:#b45309; background:#fff3e0; padding:3px 9px; border-radius:7px;">{{ tenantData.elecPct }}</span></div>
+              <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:26px; margin-top:10px;">{{ tenantData.elecAmt }}</div>
+              <div style="font-size:12.5px; color:#8a95a6; margin-top:4px;">{{ tenantData.elecKwh }}</div>
+            </div>
+            <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px; border-left:4px solid #0fb5ad;">
+              <div style="display:flex; align-items:center; justify-content:space-between;"><span style="font-size:13px; color:#6b7689;">💧 {{ t.your_water }}</span><span style="font-family:'JetBrains Mono'; font-size:12px; color:#0f766e; background:#e3f6f4; padding:3px 9px; border-radius:7px;">{{ tenantData.occ }} pers.</span></div>
+              <div style="font-family:'JetBrains Mono'; font-weight:700; font-size:26px; margin-top:10px;">{{ tenantData.waterAmt }}</div>
+              <div style="font-size:12.5px; color:#8a95a6; margin-top:4px;">{{ t.per_person }}</div>
+            </div>
+          </div>
+
+          <div style="background:#fff; border:1px solid #e6e9ef; border-radius:16px; padding:20px;">
+            <div style="font-family:'Space Grotesk'; font-weight:600; font-size:15.5px; margin-bottom:18px;">{{ t.consumption_history }}</div>
+            <div style="display:flex; align-items:flex-end; gap:10px; height:150px;">
+              <sc-for list="{{ tenantHistory }}" as="m" hint-placeholder-count="6">
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; height:100%; justify-content:flex-end;">
+                  <div style="display:flex; align-items:flex-end; gap:4px; height:115px;">
+                    <div style="width:13px; background:#f5a524; border-radius:3px 3px 0 0; height:{{ m.elecH }}; transform-origin:bottom; animation:tjrGrow .6s ease both;"></div>
+                    <div style="width:13px; background:#0fb5ad; border-radius:3px 3px 0 0; height:{{ m.waterH }}; transform-origin:bottom; animation:tjrGrow .6s ease both;"></div>
+                  </div>
+                  <div style="font-size:11px; color:#8a95a6; font-weight:500;">{{ m.label }}</div>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+        </sc-if>
+
+      </main>
+
+      <!-- ===================== BOTTOM NAV (mobile) ===================== -->
+      <sc-if value="{{ isMobile }}" hint-placeholder-val="{{ false }}">
+      <nav style="position:sticky; bottom:0; background:#fff; border-top:1px solid #e6e9ef; display:flex; padding:8px 6px calc(8px + env(safe-area-inset-bottom)); z-index:20;">
+        <button onClick="{{ goDash }}" style="{{ bn.dash }}"><span style="font-size:18px;">▦</span><span style="font-size:10px;">{{ t.nav_dash_short }}</span></button>
+        <button onClick="{{ goSaisie }}" style="{{ bn.saisie }}"><span style="font-size:18px;">⊞</span><span style="font-size:10px;">{{ t.nav_saisie_short }}</span></button>
+        <button onClick="{{ goFactures }}" style="{{ bn.factures }}"><span style="font-size:18px;">▤</span><span style="font-size:10px;">{{ t.nav_factures_short }}</span></button>
+        <button onClick="{{ goRecap }}" style="{{ bn.recap }}"><span style="font-size:18px;">📢</span><span style="font-size:10px;">{{ t.nav_recap_short }}</span></button>
+        <button onClick="{{ goMaisons }}" style="{{ bn.maisons }}"><span style="font-size:18px;">⌂</span><span style="font-size:10px;">{{ t.nav_maisons_short }}</span></button>
+        <button onClick="{{ goTenant }}" style="{{ bn.tenant }}"><span style="font-size:18px;">☻</span><span style="font-size:10px;">{{ t.nav_tenant_short }}</span></button>
+      </nav>
+      </sc-if>
+
+    </div>
+  </div>
+
+  <!-- ===================== MODAL DÉTAIL MAISON ===================== -->
+  <sc-if value="{{ houseDetail }}" hint-placeholder-val="{{ false }}">
+  <div onClick="{{ closeHouseDetail }}" style="position:fixed; inset:0; background:rgba(14,22,38,.55); backdrop-filter:blur(3px); z-index:90; display:flex; align-items:flex-start; justify-content:center; padding:40px 18px; overflow-y:auto;">
+    <div onClick="{{ stop }}" style="background:#fff; border-radius:18px; width:100%; max-width:560px; box-shadow:0 24px 70px rgba(0,0,0,.35); animation:tjrFade .28s ease both; overflow:hidden;">
+      <!-- header -->
+      <div style="display:flex; align-items:center; gap:13px; padding:20px 22px; background:#0e1626; color:#fff;">
+        <span style="width:44px; height:44px; border-radius:11px; background:{{ houseDetail.color }}; color:#0e1626; display:flex; align-items:center; justify-content:center; font-family:'Space Grotesk'; font-weight:700; font-size:20px; flex:none;">{{ houseDetail.initial }}</span>
+        <div style="flex:1; min-width:0;">
+          <div style="font-family:'Space Grotesk'; font-weight:700; font-size:17px;">{{ houseDetail.name }} · {{ t.detail_house }}</div>
+          <div style="font-size:12.5px; color:#8b97ab;">{{ houseDetail.tenant }} · {{ period }}</div>
+        </div>
+        <button onClick="{{ closeHouseDetail }}" style="width:32px; height:32px; border-radius:9px; border:none; background:#1f2e49; color:#aeb7c6; font-size:17px; cursor:pointer; flex:none;" style-hover="background:#2a3c5c; color:#fff;">✕</button>
+      </div>
+
+      <div style="padding:20px 22px;">
+        <!-- ÉLEC -->
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:12px;">
+          <span style="width:26px; height:26px; border-radius:7px; background:#fff3e0; display:flex; align-items:center; justify-content:center; font-size:14px;">⚡</span>
+          <span style="font-family:'Space Grotesk'; font-weight:600; font-size:14.5px;">{{ t.calc_elec_h }}</span>
+        </div>
+        <div style="background:#fafbfc; border:1px solid #eef0f4; border-radius:13px; overflow:hidden; margin-bottom:18px;">
+          <sc-for list="{{ houseDetail.elec.steps }}" as="st" hint-placeholder-count="4">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:11px 15px; border-bottom:1px solid #f0f2f5; background:{{ st.bg }};">
+            <div style="min-width:0;">
+              <div style="font-size:12.5px; font-weight:{{ st.w }}; color:{{ st.lc }};">{{ st.lbl }}</div>
+              <div style="font-family:'JetBrains Mono'; font-size:11.5px; color:#9aa4b4; margin-top:2px;">{{ st.calc }}</div>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:{{ st.rs }}; font-weight:{{ st.w }}; color:{{ st.rc }}; white-space:nowrap;">{{ st.res }}</div>
+          </div>
+          </sc-for>
+        </div>
+
+        <!-- EAU -->
+        <div style="display:flex; align-items:center; gap:9px; margin-bottom:12px;">
+          <span style="width:26px; height:26px; border-radius:7px; background:#e3f6f4; display:flex; align-items:center; justify-content:center; font-size:14px;">💧</span>
+          <span style="font-family:'Space Grotesk'; font-weight:600; font-size:14.5px;">{{ t.calc_water_h }}</span>
+        </div>
+        <div style="background:#fafbfc; border:1px solid #eef0f4; border-radius:13px; overflow:hidden;">
+          <sc-for list="{{ houseDetail.water.steps }}" as="st" hint-placeholder-count="3">
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:14px; padding:11px 15px; border-bottom:1px solid #f0f2f5; background:{{ st.bg }};">
+            <div style="min-width:0;">
+              <div style="font-size:12.5px; font-weight:{{ st.w }}; color:{{ st.lc }};">{{ st.lbl }}</div>
+              <div style="font-family:'JetBrains Mono'; font-size:11.5px; color:#9aa4b4; margin-top:2px;">{{ st.calc }}</div>
+            </div>
+            <div style="font-family:'JetBrains Mono'; font-size:{{ st.rs }}; font-weight:{{ st.w }}; color:{{ st.rc }}; white-space:nowrap;">{{ st.res }}</div>
+          </div>
+          </sc-for>
+        </div>
+
+        <!-- total -->
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-top:18px; padding:15px 18px; background:#0e1626; color:#fff; border-radius:13px;">
+          <span style="font-size:13px; color:#aeb7c6;">{{ t.to_pay }} · {{ houseDetail.name }}</span>
+          <span style="font-family:'JetBrains Mono'; font-weight:700; font-size:21px;">{{ houseDetail.total }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+
+  <!-- ===================== TOAST ===================== -->
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed; bottom:26px; left:50%; transform:translateX(-50%); background:#0e1626; color:#fff; padding:13px 20px; border-radius:12px; font-size:13.5px; font-weight:500; box-shadow:0 12px 34px rgba(0,0,0,.3); z-index:100; display:flex; align-items:center; gap:10px; animation:tjrToast .3s ease both;">
+    <span style="width:9px; height:9px; border-radius:50%; background:#34d399;"></span>{{ toast }}
+  </div>
+  </sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1180,&quot;height&quot;:820}}">
+class Component extends DCLogic {
+  state = {
+    lang: 'fr',
+    role: 'admin',
+    screen: 'dashboard',
+    dash: 'a',
+    isMobile: false,
+    detailType: 'elec',
+    detailHouse: null,
+    saisieType: 'elec',
+    saisieMonth: 'Juin 2026',
+    mainIdx: { elecOld: '45210', elecNew: '45982', waterOld: '1284', waterNew: '1332' },
+    elecNew: { A: '12245', B: '9145', C: '5705', D: '3422' },
+    tenant: 'A',
+    toast: '',
+  };
+
+  // ---- static reference data ----
+  houses = [
+    { id: 'A', name: 'Maison A', tenant: 'Rina R. (Vous)', tenantEn: 'Rina R. (You)', occ: 3, color: '#f5a524', elecOld: 12030, lot: 'RDC gauche' },
+    { id: 'B', name: 'Maison B', tenant: 'Hery & Voahangy', tenantEn: 'Hery & Voahangy', occ: 4, color: '#0fb5ad', elecOld: 8890, lot: 'RDC droite' },
+    { id: 'C', name: 'Maison C', tenant: 'Naina A.', tenantEn: 'Naina A.', occ: 2, color: '#6366f1', elecOld: 5560, lot: 'Étage' },
+    { id: 'D', name: 'Studio D', tenant: 'Tiana M.', tenantEn: 'Tiana M.', occ: 1, color: '#ec4899', elecOld: 3320, lot: 'Annexe' },
+  ];
+  elecMainInfo = { kwh: 772, total: 462000, oldI: 45210, newI: 45982, no: 'JRM-2026-06-ELEC', date: '16/06/2026', due: '30/06/2026' };
+  waterMainInfo = { m3: 48, total: 96000, oldI: 1284, newI: 1332, no: 'JRM-2026-06-EAU', date: '18/06/2026', due: '02/07/2026' };
+  monthsRaw = [
+    { fr: 'Jan', en: 'Jan', elec: 398000, water: 84000 },
+    { fr: 'Fév', en: 'Feb', elec: 415000, water: 88000 },
+    { fr: 'Mar', en: 'Mar', elec: 372000, water: 90000 },
+    { fr: 'Avr', en: 'Apr', elec: 441000, water: 92000 },
+    { fr: 'Mai', en: 'May', elec: 428000, water: 91000 },
+    { fr: 'Jun', en: 'Jun', elec: 462000, water: 96000 },
+  ];
+
+  I18N = {
+    fr: {
+      tagline: 'Factures JIRAMA', period: 'Période', period_open: 'Période ouverte',
+      nav_dash: 'Tableau de bord', nav_saisie: 'Saisie des index', nav_factures: 'Factures', nav_maisons: 'Maisons & locataires', nav_tenant: 'Espace locataire',
+      nav_dash_short: 'Bord', nav_saisie_short: 'Saisie', nav_factures_short: 'Factures', nav_maisons_short: 'Maisons', nav_tenant_short: 'Locataire',
+      role_admin: 'Admin', role_tenant: 'Locataire',
+      elec: 'Électricité', water: 'Eau',
+      dash_overview: "Vue d'ensemble", dash_compare: 'Par énergie', new_reading: 'Nouveau relevé',
+      kpi_total: 'Total période', kpi_loss: 'Pertes réseau',
+      monthly: 'Consommation mensuelle', repartition: 'Répartition électricité', repartition_sub: 'Part de chaque maison ce mois-ci',
+      main_meter: 'Compteur principal', per_person: 'Par personne',
+      // titles
+      tt_dash: 'Tableau de bord', ts_dash: 'Aperçu de la période en cours',
+      tt_saisie: 'Saisie des index', ts_saisie: "Relevez l'index de chaque sous-compteur",
+      tt_factures: 'Factures', ts_factures: "Historique complet des factures JIRAMA",
+      tt_detail: 'Détail de la facture', ts_detail: 'Répartition par maison',
+      tt_maisons: 'Maisons & locataires', ts_maisons: 'Gestion du bâtiment et des occupants',
+      tt_tenant: 'Espace locataire', ts_tenant: 'Vos factures et consommations',
+      // saisie
+      saisie_type: "Type de relevé", old_index: 'Ancien index', new_index: 'Nouvel index', consumption: 'Consommation', proof: 'Preuve',
+      add_photo: 'Photo compteur', main_reading: 'Index compteur principal', sub_total: 'Somme sous-compteurs', validate: 'Valider le relevé', validated: 'Relevé enregistré ✓',
+      diff_detected: 'Écart détecté', recompute: 'recalculé automatiquement', live_calc: 'Calcul en direct',
+      // factures / detail
+      invoice: 'Facture', period_col: 'Période', amount: 'Montant', status: 'Statut', actions: '',
+      st_paid: 'Payée', st_due: 'À payer', st_pending: 'En attente',
+      view: 'Voir', download_pdf: 'Télécharger PDF', generate_pdf: 'Générer le PDF', pdf_done: 'Facture PDF générée et téléchargée',
+      invoice_no: 'N° facture', bill_date: 'Émission', due_date: 'Échéance', total_bill: 'Montant total facturé',
+      house: 'Maison', tenant: 'Locataire', kwh: 'kWh', share: 'Part', occupants: 'Occupants', amount_due: 'Montant dû',
+      sub_meters_total: 'Total sous-compteurs', main_total: 'Compteur principal', network_loss: 'Pertes réseau', redistributed: 'redistribuées au prorata',
+      effective_rate: 'Tarif effectif', how_elec: "Le montant est réparti au prorata des kWh consommés. L'écart entre le compteur principal et la somme des sous-compteurs est redistribué proportionnellement.",
+      how_water: "Le montant total de l'eau est réparti selon le nombre d'occupants de chaque maison.", total_occ: "Total occupants",
+      // maisons
+      add_house: 'Ajouter une maison', sub_meter: 'Sous-compteur', edit: 'Modifier', occ_label: 'occupant(s)',
+      // tenant
+      your_house: 'Votre maison', your_total: 'Votre total ce mois', your_elec: 'Votre électricité', your_water: 'Votre eau',
+      consumption_history: 'Historique de consommation', this_period: 'Cette période', select_house: 'Voir une autre maison',
+      nav_recap: 'Récapitulatif', nav_recap_short: 'Récap',
+      tt_recap: 'Récapitulatif du mois', ts_recap: 'Total EAU + JIRO par maison, prêt à partager',
+      both: 'Élec & Eau',
+      calc_title: 'Formule de calcul — Électricité', calc_sub: 'Méthode de répartition appliquée chaque mois',
+      calc_note: 'Les pertes réseau sont ainsi redistribuées au prorata des kWh consommés par chaque maison.',
+      see_closer: 'Voir plus près', detail_house: 'Détail du calcul', calc_elec_h: 'Calcul électricité', calc_water_h: 'Calcul eau', to_pay: 'Total à payer',
+      form_month: 'Mois de la facture', form_utility: 'Type de relevé', main_meter_idx: 'Index du compteur principal JIRAMA',
+      occ_water_note: "L'eau est répartie selon le nombre d'occupants — aucun index par maison à relever. Renseignez seulement l'index du compteur principal.",
+      sub_meters_idx: 'Index des sous-compteurs', total_consumed: 'Consommation relevée', total_occ_label: 'Total occupants',
+      recap_title: 'Annonce du mois', recap_combined: 'EAU + JIRO', recap_intro: 'Montant à régler par maison ce mois-ci',
+      recap_greeting: 'Bonjour à toutes et à tous !', recap_nb: 'Le détail des calculs est consultable dans l’application',
+      grand_total: 'Total général', deadline: 'Date limite de paiement', copy_msg: 'Copier le message', copied: 'Message copié ✓', view_details: 'Voir détails',
+    },
+    en: {
+      tagline: 'JIRAMA bills', period: 'Period', period_open: 'Period open',
+      nav_dash: 'Dashboard', nav_saisie: 'Meter readings', nav_factures: 'Invoices', nav_maisons: 'Houses & tenants', nav_tenant: 'Tenant area',
+      nav_dash_short: 'Home', nav_saisie_short: 'Readings', nav_factures_short: 'Invoices', nav_maisons_short: 'Houses', nav_tenant_short: 'Tenant',
+      role_admin: 'Admin', role_tenant: 'Tenant',
+      elec: 'Electricity', water: 'Water',
+      dash_overview: 'Overview', dash_compare: 'By utility', new_reading: 'New reading',
+      kpi_total: 'Period total', kpi_loss: 'Network loss',
+      monthly: 'Monthly consumption', repartition: 'Electricity split', repartition_sub: "Each house's share this month",
+      main_meter: 'Main meter', per_person: 'Per person',
+      tt_dash: 'Dashboard', ts_dash: 'Current period at a glance',
+      tt_saisie: 'Meter readings', ts_saisie: 'Record each sub-meter index',
+      tt_factures: 'Invoices', ts_factures: 'Full JIRAMA invoice history',
+      tt_detail: 'Invoice detail', ts_detail: 'Split by house',
+      tt_maisons: 'Houses & tenants', ts_maisons: 'Building and occupants management',
+      tt_tenant: 'Tenant area', ts_tenant: 'Your invoices and consumption',
+      saisie_type: 'Reading type', old_index: 'Old index', new_index: 'New index', consumption: 'Consumption', proof: 'Proof',
+      add_photo: 'Meter photo', main_reading: 'Main meter index', sub_total: 'Sub-meters sum', validate: 'Validate reading', validated: 'Reading saved ✓',
+      diff_detected: 'Difference detected', recompute: 'recomputed automatically', live_calc: 'Live calculation',
+      invoice: 'Invoice', period_col: 'Period', amount: 'Amount', status: 'Status', actions: '',
+      st_paid: 'Paid', st_due: 'To pay', st_pending: 'Pending',
+      view: 'View', download_pdf: 'Download PDF', generate_pdf: 'Generate PDF', pdf_done: 'PDF invoice generated and downloaded',
+      invoice_no: 'Invoice no.', bill_date: 'Issued', due_date: 'Due', total_bill: 'Total billed amount',
+      house: 'House', tenant: 'Tenant', kwh: 'kWh', share: 'Share', occupants: 'Occupants', amount_due: 'Amount due',
+      sub_meters_total: 'Sub-meters total', main_total: 'Main meter', network_loss: 'Network loss', redistributed: 'redistributed pro-rata',
+      effective_rate: 'Effective rate', how_elec: 'The amount is split pro-rata to kWh consumed. The gap between the main meter and the sum of sub-meters is redistributed proportionally.',
+      how_water: 'The total water amount is split by the number of occupants in each house.', total_occ: 'Total occupants',
+      add_house: 'Add a house', sub_meter: 'Sub-meter', edit: 'Edit', occ_label: 'occupant(s)',
+      your_house: 'Your house', your_total: 'Your total this month', your_elec: 'Your electricity', your_water: 'Your water',
+      consumption_history: 'Consumption history', this_period: 'This period', select_house: 'View another house',
+      nav_recap: 'Summary', nav_recap_short: 'Summary',
+      tt_recap: 'Monthly summary', ts_recap: 'Total WATER + POWER per house, ready to share',
+      both: 'Power & Water',
+      calc_title: 'Calculation formula — Electricity', calc_sub: 'Distribution method applied every month',
+      calc_note: 'Network losses are thus redistributed pro-rata to the kWh consumed by each house.',
+      see_closer: 'See closer', detail_house: 'Calculation detail', calc_elec_h: 'Electricity calculation', calc_water_h: 'Water calculation', to_pay: 'Total to pay',
+      form_month: 'Invoice month', form_utility: 'Reading type', main_meter_idx: 'Main JIRAMA meter index',
+      occ_water_note: 'Water is split by number of occupants — no per-house index to read. Only enter the main meter index.',
+      sub_meters_idx: 'Sub-meter indexes', total_consumed: 'Recorded consumption', total_occ_label: 'Total occupants',
+      recap_title: 'Monthly announcement', recap_combined: 'WATER + POWER', recap_intro: 'Amount each house owes this month',
+      recap_greeting: 'Hello everyone!', recap_nb: 'Calculation details are available in the app',
+      grand_total: 'Grand total', deadline: 'Payment deadline', copy_msg: 'Copy message', copied: 'Message copied ✓', view_details: 'View details',
+    },
+  };
+
+  componentDidMount() {
+    this._onResize = () => {
+      const m = window.innerWidth < 880;
+      if (m !== this.state.isMobile) this.setState({ isMobile: m });
+    };
+    this._onResize();
+    window.addEventListener('resize', this._onResize);
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this._onResize); }
+
+  fmt(n) { return Math.round(n).toLocaleString('fr-FR').replace(/\u202f/g, ' ') + ' Ar'; }
+
+  showToast(msg) {
+    this.setState({ toast: msg });
+    clearTimeout(this._tt);
+    this._tt = setTimeout(() => this.setState({ toast: '' }), 2600);
+  }
+
+  go(screen) { this.setState({ screen }); window.scrollTo(0, 0); }
+
+  // ---- electricity computation ----
+  calcElec() {
+    const rows = this.houses.map(h => {
+      const oldI = h.elecOld;
+      const newI = Number(this.state.elecNew[h.id]) || oldI;
+      const kwh = Math.max(0, newI - oldI);
+      return { h, oldI, newI, kwh };
+    });
+    const sumSub = rows.reduce((a, r) => a + r.kwh, 0);
+    const mainKwh = this.elecMainInfo.kwh;
+    const loss = mainKwh - sumSub;
+    const total = this.elecMainInfo.total;
+    const rate = sumSub > 0 ? total / sumSub : 0;
+    rows.forEach(r => { r.amount = sumSub > 0 ? Math.round(r.kwh * rate) : 0; r.pct = sumSub > 0 ? r.kwh / sumSub : 0; });
+    return { rows, sumSub, mainKwh, loss, total, rate };
+  }
+  calcWater() {
+    const totalOcc = this.houses.reduce((a, h) => a + h.occ, 0);
+    const total = this.waterMainInfo.total;
+    const per = total / totalOcc;
+    const rows = this.houses.map(h => ({ h, occ: h.occ, amount: Math.round(h.occ * per), pct: h.occ / totalOcc }));
+    return { rows, totalOcc, total, per };
+  }
+
+  navStyle(key, active) {
+    const on = this.state.screen === key;
+    return `display:flex; align-items:center; gap:11px; width:100%; text-align:left; border:none; cursor:pointer; font-family:'IBM Plex Sans'; font-weight:${on ? 600 : 500}; font-size:13.5px; padding:11px 13px; border-radius:10px; background:${on ? '#1b2942' : 'transparent'}; color:${on ? '#fff' : '#aeb7c6'};`;
+  }
+  navDot(key, color) {
+    const on = this.state.screen === key;
+    return `width:7px; height:7px; border-radius:50%; flex:none; background:${on ? color : '#3a4client'};`.replace('#3a4client', '#39455c');
+  }
+  bnStyle(key) {
+    const on = this.state.screen === key;
+    return `flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; border:none; background:transparent; cursor:pointer; padding:6px 2px; color:${on ? '#0e1626' : '#9aa4b4'}; font-weight:${on ? 600 : 500}; font-family:'IBM Plex Sans';`;
+  }
+  pill(active) {
+    return `border:none; cursor:pointer; font-family:'IBM Plex Sans'; font-weight:600; font-size:13px; padding:7px 13px; border-radius:7px; background:${active ? '#fff' : 'transparent'}; color:${active ? '#0e1626' : '#7b8698'}; box-shadow:${active ? '0 1px 3px rgba(0,0,0,.12)' : 'none'};`;
+  }
+  tab(active, color) {
+    return `border:none; cursor:pointer; font-family:'IBM Plex Sans'; font-weight:600; font-size:13.5px; padding:9px 16px; border-radius:9px; background:${active ? '#0e1626' : '#fff'}; color:${active ? '#fff' : '#5a6577'}; border:1px solid ${active ? '#0e1626' : '#e6e9ef'};`;
+  }
+
+  renderVals() {
+    const s = this.state;
+    const t = this.I18N[s.lang];
+    const isAdmin = s.role === 'admin';
+    const elec = this.calcElec();
+    const water = this.calcWater();
+    const totalPeriod = this.elecMainInfo.total + this.waterMainInfo.total;
+    const houseColor = id => this.houses.find(h => h.id === id).color;
+
+    // screen meta (force tenant area when role=tenant)
+    let screen = s.screen;
+    if (!isAdmin && (screen === 'saisie' || screen === 'maisons' || screen === 'recap')) screen = 'tenant';
+    const titles = {
+      dashboard: [t.tt_dash, t.ts_dash], saisie: [t.tt_saisie, t.ts_saisie],
+      factures: [t.tt_factures, t.ts_factures], detail: [t.tt_detail + ' · ' + this.label('Juin 2026', 'June 2026'), t.ts_detail],
+      maisons: [t.tt_maisons, t.ts_maisons], tenant: [t.tt_tenant, t.ts_tenant],
+      recap: [t.tt_recap, t.ts_recap],
+    };
+
+    const elecMax = Math.max(...this.monthsRaw.map(m => m.elec));
+    const waterMax = Math.max(...this.monthsRaw.map(m => m.water));
+    const months = this.monthsRaw.map(m => ({
+      label: s.lang === 'fr' ? m.fr : m.en,
+      elecH: Math.round(m.elec / elecMax * 130) + 'px',
+      waterH: Math.round(m.water / waterMax * 130) + 'px',
+      elecVal: this.fmt(m.elec), waterVal: this.fmt(m.water),
+    }));
+
+    const elecRows = elec.rows.map(r => ({
+      house: r.h.name, tenant: s.lang === 'fr' ? r.h.tenant : r.h.tenantEn, color: r.h.color,
+      kwh: r.kwh + ' kWh', amount: this.fmt(r.amount), barW: Math.round(r.pct * 100) + '%', pct: Math.round(r.pct * 100) + '%',
+      oldI: r.oldI.toLocaleString('fr-FR'), newI: r.newI.toLocaleString('fr-FR'),
+    }));
+    const waterRows = water.rows.map(r => ({
+      house: r.h.name, tenant: s.lang === 'fr' ? r.h.tenant : r.h.tenantEn, color: r.h.color,
+      occ: r.occ, amount: this.fmt(r.amount), barW: Math.round(r.pct * 100) + '%', pct: Math.round(r.pct * 100) + '%',
+    }));
+
+    // ---- detail (selected invoice) ----
+    const dType = s.detailType;
+    const openHouse = id => () => this.setState({ detailHouse: id });
+    const detailElecRows = elec.rows.map((r, i) => ({ ...elecRows[i], id: r.h.id, metric: elecRows[i].kwh, open: openHouse(r.h.id) }));
+    const detailWaterRows = water.rows.map((r, i) => ({ ...waterRows[i], id: r.h.id, metric: r.occ + (s.lang === 'fr' ? ' pers.' : ' ppl'), open: openHouse(r.h.id) }));
+    const combinedDetailRows = this.houses.map(h => {
+      const e = elec.rows.find(r => r.h.id === h.id).amount;
+      const w = water.rows.find(r => r.h.id === h.id).amount;
+      return { id: h.id, house: h.name, tenant: s.lang === 'fr' ? h.tenant : h.tenantEn, color: h.color, elecAmt: this.fmt(e), waterAmt: this.fmt(w), amount: this.fmt(e + w), open: openHouse(h.id) };
+    });
+
+    // ---- per-house precise breakdown (modal) ----
+    let houseDetail = null;
+    if (s.detailHouse) {
+      const h = this.houses.find(x => x.id === s.detailHouse);
+      const er = elec.rows.find(r => r.h.id === h.id);
+      const wr = water.rows.find(r => r.h.id === h.id);
+      const eAmt = er.amount, wAmt = wr.amount;
+      houseDetail = {
+        name: h.name, tenant: s.lang === 'fr' ? h.tenant : h.tenantEn, color: h.color, initial: h.name.slice(-1),
+        total: this.fmt(eAmt + wAmt),
+        elec: {
+          oldI: er.oldI.toLocaleString('fr-FR'), newI: er.newI.toLocaleString('fr-FR'),
+          kwh: er.kwh, sumSub: elec.sumSub, mainKwh: elec.mainKwh, loss: elec.loss,
+          rate: this.fmt(elec.rate), pct: Math.round(er.pct * 100), amount: this.fmt(eAmt),
+          steps: [
+            { lbl: this.label('Consommation', 'Consumption'), calc: `${er.newI.toLocaleString('fr-FR')} − ${er.oldI.toLocaleString('fr-FR')}`, res: er.kwh + ' kWh' },
+            { lbl: this.label('Part de la maison', 'House share'), calc: `${er.kwh} ÷ ${elec.sumSub} kWh`, res: Math.round(er.pct * 100) + ' %' },
+            { lbl: this.label('Tarif effectif', 'Effective rate'), calc: `${this.fmt(elec.total)} ÷ ${elec.sumSub} kWh`, res: this.fmt(elec.rate) + ' /kWh' },
+            { lbl: this.label('Montant électricité', 'Electricity amount'), calc: `${er.kwh} kWh × ${this.fmt(elec.rate)}`, res: this.fmt(eAmt), strong: true },
+          ],
+        },
+        water: {
+          occ: wr.occ, totalOcc: water.totalOcc, per: this.fmt(water.per), pct: Math.round(wr.pct * 100), amount: this.fmt(wAmt),
+          steps: [
+            { lbl: this.label('Coût par personne', 'Cost per person'), calc: `${this.fmt(water.total)} ÷ ${water.totalOcc} pers.`, res: this.fmt(water.per) },
+            { lbl: this.label('Occupants', 'Occupants'), calc: this.label(h.name, h.name), res: wr.occ + (s.lang === 'fr' ? ' pers.' : ' ppl') },
+            { lbl: this.label('Montant eau', 'Water amount'), calc: `${wr.occ} × ${this.fmt(water.per)}`, res: this.fmt(wAmt), strong: true },
+          ],
+        },
+      };
+    }
+    let detail;
+    if (dType === 'both') {
+      detail = { type: 'both', isElec: false, isWater: false, isBoth: true, showSplit: false, showFormula: true, accent: '#6366f1', icon: '⚡💧', label: t.both,
+        no: this.label('2 factures', '2 invoices'), date: this.elecMainInfo.date, due: this.elecMainInfo.due,
+        total: this.fmt(this.elecMainInfo.total + this.waterMainInfo.total), rows: combinedDetailRows,
+        elecTotal: this.fmt(this.elecMainInfo.total), waterTotal: this.fmt(this.waterMainInfo.total),
+        elecNo: this.elecMainInfo.no, waterNo: this.waterMainInfo.no, elecDue: this.elecMainInfo.due, waterDue: this.waterMainInfo.due,
+        how: this.label("Total combiné EAU + JIRO : l'électricité est répartie au prorata des kWh, l'eau selon le nombre d'occupants.", 'Combined WATER + POWER total: electricity is split pro-rata to kWh, water by number of occupants.') };
+    } else if (dType === 'elec') {
+      detail = { type: 'elec', isElec: true, isWater: false, isBoth: false, showSplit: true, showFormula: true, accent: '#f5a524', icon: '⚡', label: t.elec, metricLabel: t.kwh,
+        no: this.elecMainInfo.no, date: this.elecMainInfo.date, due: this.elecMainInfo.due,
+        total: this.fmt(this.elecMainInfo.total), rows: detailElecRows, sumSub: elec.sumSub + ' kWh', mainKwh: elec.mainKwh + ' kWh',
+        loss: elec.loss + ' kWh', rate: this.fmt(elec.rate) + ' / kWh', how: t.how_elec };
+    } else {
+      detail = { type: 'water', isElec: false, isWater: true, isBoth: false, showSplit: true, showFormula: false, accent: '#0fb5ad', icon: '💧', label: t.water, metricLabel: t.occupants,
+        no: this.waterMainInfo.no, date: this.waterMainInfo.date, due: this.waterMainInfo.due,
+        total: this.fmt(this.waterMainInfo.total), rows: detailWaterRows, totalOcc: water.totalOcc, per: this.fmt(water.per), how: t.how_water };
+    }
+
+    // ---- saisie rows (editable) ----
+    const saisieIsElec = s.saisieType === 'elec';
+    const saisieRows = this.houses.map(h => {
+      const oldI = h.elecOld;
+      const val = this.state.elecNew[h.id];
+      const newI = Number(val) || oldI;
+      const kwh = Math.max(0, newI - oldI);
+      return {
+        house: h.name, tenant: s.lang === 'fr' ? h.tenant : h.tenantEn, color: h.color, initial: h.name.slice(-1),
+        oldI: oldI.toLocaleString('fr-FR'), value: val, kwh: kwh + ' kWh',
+        occ: h.occ, occOnInput: e => {}, // occupants managed in Maisons
+        onInput: e => this.setState({ elecNew: { ...this.state.elecNew, [h.id]: e.target.value } }),
+      };
+    });
+    const saisieDiff = elec.loss;
+
+    // ---- main-meter index entry (form) ----
+    const mi = s.mainIdx;
+    const mPair = saisieIsElec ? { o: mi.elecOld, n: mi.elecNew, ko: 'elecOld', kn: 'elecNew', unit: 'kWh' }
+                               : { o: mi.waterOld, n: mi.waterNew, ko: 'waterOld', kn: 'waterNew', unit: 'm³' };
+    const mainConsumed = Math.max(0, (Number(mPair.n) || 0) - (Number(mPair.o) || 0));
+    const setMain = key => e => this.setState({ mainIdx: { ...this.state.mainIdx, [key]: e.target.value } });
+    const saisieMonths = ['Juin 2026', 'Mai 2026', 'Avril 2026', 'Mars 2026', 'Février 2026', 'Janvier 2026'];
+
+    // ---- house cards ----
+    const houseCards = this.houses.map(h => ({
+      name: h.name, tenant: s.lang === 'fr' ? h.tenant : h.tenantEn, color: h.color, lot: h.lot,
+      occ: h.occ, elecMeter: 'SC-' + h.id + '-EL', waterMeter: 'SC-' + h.id + '-EA', initial: h.name.slice(-1),
+    }));
+
+    // ---- invoices list ----
+    const invoices = [
+      { no: this.elecMainInfo.no, type: t.elec, icon: '⚡', accent: '#f5a524', period: this.label('Juin 2026', 'June 2026'), amount: this.fmt(this.elecMainInfo.total), status: t.st_due, stColor: '#b45309', stBg: '#fff3e0', open: () => this.setState({ screen: 'detail', detailType: 'elec' }) },
+      { no: this.waterMainInfo.no, type: t.water, icon: '💧', accent: '#0fb5ad', period: this.label('Juin 2026', 'June 2026'), amount: this.fmt(this.waterMainInfo.total), status: t.st_due, stColor: '#0f766e', stBg: '#e3f6f4', open: () => this.setState({ screen: 'detail', detailType: 'water' }) },
+      { no: 'JRM-2026-05-ELEC', type: t.elec, icon: '⚡', accent: '#f5a524', period: this.label('Mai 2026', 'May 2026'), amount: this.fmt(428000), status: t.st_paid, stColor: '#15803d', stBg: '#e7f6ec', open: () => this.setState({ screen: 'detail', detailType: 'elec' }) },
+      { no: 'JRM-2026-05-EAU', type: t.water, icon: '💧', accent: '#0fb5ad', period: this.label('Mai 2026', 'May 2026'), amount: this.fmt(91000), status: t.st_paid, stColor: '#15803d', stBg: '#e7f6ec', open: () => this.setState({ screen: 'detail', detailType: 'water' }) },
+      { no: 'JRM-2026-04-ELEC', type: t.elec, icon: '⚡', accent: '#f5a524', period: this.label('Avril 2026', 'April 2026'), amount: this.fmt(441000), status: t.st_paid, stColor: '#15803d', stBg: '#e7f6ec', open: () => this.setState({ screen: 'detail', detailType: 'elec' }) },
+      { no: 'JRM-2026-04-EAU', type: t.water, icon: '💧', accent: '#0fb5ad', period: this.label('Avril 2026', 'April 2026'), amount: this.fmt(92000), status: t.st_paid, stColor: '#15803d', stBg: '#e7f6ec', open: () => this.setState({ screen: 'detail', detailType: 'water' }) },
+    ];
+
+    // ---- tenant view ----
+    const th = this.houses.find(h => h.id === s.tenant);
+    const tElecRow = elec.rows.find(r => r.h.id === s.tenant);
+    const tWaterRow = water.rows.find(r => r.h.id === s.tenant);
+    const tenantData = {
+      name: th.name, tenant: s.lang === 'fr' ? th.tenant : th.tenantEn, color: th.color, occ: th.occ,
+      elecAmt: this.fmt(tElecRow.amount), waterAmt: this.fmt(tWaterRow.amount), total: this.fmt(tElecRow.amount + tWaterRow.amount),
+      elecKwh: tElecRow.kwh + ' kWh', elecPct: Math.round(tElecRow.pct * 100) + '%',
+    };
+    const tenantSwitch = this.houses.map(h => ({
+      id: h.id, name: h.name, color: h.color, active: h.id === s.tenant,
+      style: `border:1px solid ${h.id === s.tenant ? h.color : '#e6e9ef'}; background:${h.id === s.tenant ? h.color + '18' : '#fff'}; color:#0e1626; cursor:pointer; border-radius:9px; padding:8px 14px; font-size:13px; font-weight:600; font-family:'IBM Plex Sans';`,
+      onClick: () => this.setState({ tenant: h.id }),
+    }));
+
+    // ---- récapitulatif (combined per-house announcement) ----
+    const num = n => Math.round(n).toLocaleString('fr-FR').replace(/\u202f/g, ' ');
+    const recapRows = this.houses.map(h => {
+      const e = elec.rows.find(r => r.h.id === h.id).amount;
+      const w = water.rows.find(r => r.h.id === h.id).amount;
+      const name = (s.lang === 'fr' ? h.tenant : h.tenantEn).replace(' (Vous)', '').replace(' (You)', '');
+      return { name, house: h.name, color: h.color, elecAmt: this.fmt(e), waterAmt: this.fmt(w), total: this.fmt(e + w), amt: num(e + w), _t: e + w };
+    });
+    const recapGrand = recapRows.reduce((a, r) => a + r._t, 0);
+    const recapMonth = this.label('Juin 2026', 'June 2026');
+    const recapDeadline = this.label('30 Juin 2026', 'June 30, 2026');
+    const announceLines = recapRows.map(r => `${r.name} : ${r.amt}`).join('\n');
+    const announceText = (s.lang === 'fr'
+      ? `🏠 ${t.recap_greeting}\nMontant total EAU + JIRO — ${recapMonth} :\n\n${announceLines}\n\nNB : ${t.recap_nb} (montants en Ariary).\n⏰ ${t.deadline} : ${recapDeadline}\n\nMerci à tous 🎉`
+      : `🏠 ${t.recap_greeting}\nTotal WATER + POWER — ${recapMonth}:\n\n${announceLines}\n\nNB: ${t.recap_nb} (amounts in Ariary).\n⏰ ${t.deadline}: ${recapDeadline}\n\nThank you all 🎉`);
+
+    return {
+      t, period: this.label('Juin 2026', 'June 2026'),
+      showSidebar: !s.isMobile, isMobile: s.isMobile,
+      screenTitle: titles[screen][0], screenSub: titles[screen][1],
+      titleSize: s.isMobile ? '21px' : '25px',
+      topbarStyle: `display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; padding:${s.isMobile ? '16px 18px' : '20px 30px'}; background:#fff; border-bottom:1px solid #e6e9ef; position:sticky; top:0; z-index:15;`,
+      mainStyle: `flex:1; padding:${s.isMobile ? '18px 16px 26px' : '26px 30px 40px'}; max-width:1180px; width:100%; margin:0 auto;`,
+
+      // nav
+      nav: {
+        dash: { style: this.navStyle('dashboard'), dot: this.navDot('dashboard', '#f5a524') },
+        saisie: { style: this.navStyle('saisie'), dot: this.navDot('saisie', '#0fb5ad') },
+        factures: { style: this.navStyle('factures'), dot: this.navDot('factures', '#6366f1') },
+        maisons: { style: this.navStyle('maisons'), dot: this.navDot('maisons', '#ec4899') },
+        recap: { style: this.navStyle('recap'), dot: this.navDot('recap', '#22c55e') },
+        tenant: { style: this.navStyle('tenant'), dot: this.navDot('tenant', '#34d399') },
+      },
+      bn: { dash: this.bnStyle('dashboard'), saisie: this.bnStyle('saisie'), factures: this.bnStyle('factures'), recap: this.bnStyle('recap'), maisons: this.bnStyle('maisons'), tenant: this.bnStyle('tenant') },
+      goDash: () => this.go('dashboard'), goSaisie: () => this.go('saisie'), goFactures: () => this.go('factures'),
+      goMaisons: () => this.go('maisons'), goTenant: () => this.go('tenant'), goRecap: () => this.go('recap'),
+
+      // switches
+      setFr: () => this.setState({ lang: 'fr' }), setEn: () => this.setState({ lang: 'en' }),
+      langFrStyle: this.pill(s.lang === 'fr'), langEnStyle: this.pill(s.lang === 'en'),
+      setAdmin: () => this.setState({ role: 'admin' }), setTenant: () => this.setState({ role: 'tenant', screen: 'tenant' }),
+      roleAdminStyle: this.pill(isAdmin), roleTenantStyle: this.pill(!isAdmin),
+
+      // dashboard
+      isDashboard: screen === 'dashboard', isDashA: s.dash === 'a', isDashB: s.dash === 'b',
+      setDashA: () => this.setState({ dash: 'a' }), setDashB: () => this.setState({ dash: 'b' }),
+      dashAStyle: this.tab(s.dash === 'a'), dashBStyle: this.tab(s.dash === 'b'),
+      kpiCols: s.isMobile ? 'repeat(2,1fr)' : 'repeat(4,1fr)',
+      dashAcols: s.isMobile ? '1fr' : '1.5fr 1fr', dashBcols: s.isMobile ? '1fr' : '1fr 1fr',
+      kpi: {
+        total: this.fmt(totalPeriod), totalDelta: this.label('+4,1 % vs mai', '+4.1% vs May'),
+        elec: this.fmt(this.elecMainInfo.total), elecKwh: this.elecMainInfo.kwh + ' kWh',
+        water: this.fmt(this.waterMainInfo.total), waterOcc: water.totalOcc + (s.lang === 'fr' ? ' occupants' : ' occupants'),
+        loss: elec.loss + ' kWh', lossKwh: (elec.mainKwh > 0 ? Math.round(elec.loss / elec.mainKwh * 100) : 0) + '% ' + (s.lang === 'fr' ? 'du principal' : 'of main'),
+      },
+      months, elecRows, waterRows,
+      elecMain: { range: this.elecMainInfo.oldI.toLocaleString('fr-FR') + ' → ' + this.elecMainInfo.newI.toLocaleString('fr-FR') },
+      waterPerPerson: this.fmt(water.per),
+
+      // detail
+      detail, isDetail: screen === 'detail',
+      detailGrid: s.isMobile ? '1.3fr .7fr .6fr 1.4fr' : '1.7fr .9fr .7fr 1.8fr',
+      saisieGrid: s.isMobile ? '1fr 1fr' : '1.6fr 1fr 1fr 1fr 1.1fr',
+      setDetailBoth: () => this.setState({ detailType: 'both' }), setDetailElec: () => this.setState({ detailType: 'elec' }), setDetailWater: () => this.setState({ detailType: 'water' }),
+      detailBothTab: this.tab(dType === 'both'), detailElecTab: this.tab(dType === 'elec'), detailWaterTab: this.tab(dType === 'water'),
+      genPdf: () => this.showToast(t.pdf_done),
+      backToFactures: () => this.go('factures'),
+
+      // saisie
+      isSaisie: screen === 'saisie', saisieRows, saisieDiff: saisieDiff + ' kWh',
+      saisieMain: this.elecMainInfo.kwh + ' kWh', saisieSub: elec.sumSub + ' kWh',
+      saisieDiffPositive: saisieDiff !== 0,
+      validateSaisie: () => this.showToast(t.validated),
+      saisieIsElec, saisieIsWater: !saisieIsElec,
+      saisieMonth: s.saisieMonth, saisieMonths,
+      onMonthChange: e => this.setState({ saisieMonth: e.target.value }),
+      setSaisieElec: () => this.setState({ saisieType: 'elec' }), setSaisieWater: () => this.setState({ saisieType: 'water' }),
+      saisieElecTab: this.tab(saisieIsElec), saisieWaterTab: this.tab(!saisieIsElec),
+      mainOldVal: mPair.o, mainNewVal: mPair.n, mainUnit: mPair.unit,
+      mainOnOld: setMain(mPair.ko), mainOnNew: setMain(mPair.kn),
+      mainConsumed: mainConsumed + ' ' + mPair.unit,
+      saisieAccent: saisieIsElec ? '#f5a524' : '#0fb5ad',
+      saisieIcon: saisieIsElec ? '⚡' : '💧',
+      saisieTotalOcc: water.totalOcc,
+
+      // factures
+      isFactures: screen === 'factures', invoices,
+
+      // maisons
+      isMaisons: screen === 'maisons', houseCards,
+      maisonsCols: s.isMobile ? '1fr' : 'repeat(2,1fr)',
+      addHouse: () => this.showToast(s.lang === 'fr' ? 'Formulaire « nouvelle maison » (démo)' : 'New-house form (demo)'),
+
+      // tenant
+      isTenant: screen === 'tenant', tenantData, tenantSwitch, tenantHistory: months,
+      tenantDownload: () => this.showToast(t.pdf_done),
+
+      // recap
+      isRecap: screen === 'recap', recapRows, recapGrand: this.fmt(recapGrand), recapDeadline,
+      recapCols: s.isMobile ? '1fr' : '1.05fr 1fr',
+      copyAnnounce: () => { try { navigator.clipboard.writeText(announceText); } catch (e) {} this.showToast(t.copied); },
+      openDetailBoth: () => this.setState({ screen: 'detail', detailType: 'both' }),
+      houseDetail: houseDetail ? this.styleSteps(houseDetail) : null,
+      closeHouseDetail: () => this.setState({ detailHouse: null }),
+      stop: e => { e.stopPropagation(); },
+
+      elecFormulas: [
+        { n: '1', label: this.label("Consommation d'une maison", 'House consumption'), f: this.label('Conso = Nouvel index − Ancien index', 'Usage = New index − Old index') },
+        { n: '2', label: this.label('Total des sous-compteurs', 'Sub-meters total'), f: this.label('Σ sous-compteurs = somme des consommations', 'Σ sub-meters = sum of usages') },
+        { n: '3', label: this.label('Pertes réseau', 'Network loss'), f: this.label('Pertes = Index principal − Σ sous-compteurs', 'Loss = Main index − Σ sub-meters') },
+        { n: '4', label: this.label('Tarif effectif', 'Effective rate'), f: this.label('Tarif = Montant total ÷ Σ sous-compteurs', 'Rate = Total amount ÷ Σ sub-meters') },
+        { n: '5', label: this.label('Montant par maison', 'Amount per house'), f: this.label('Montant = Conso maison × Tarif effectif', 'Amount = House usage × Effective rate') },
+      ],
+
+      toast: s.toast,
+    };
+  }
+
+  label(fr, en) { return this.state.lang === 'fr' ? fr : en; }
+
+  styleSteps(hd) {
+    const deco = st => ({
+      ...st,
+      bg: st.strong ? '#fffaf2' : '#fff',
+      w: st.strong ? 700 : 500,
+      lc: st.strong ? '#0e1626' : '#5a6577',
+      rc: st.strong ? '#b45309' : '#0e1626',
+      rs: st.strong ? '15px' : '13px',
+    });
+    return { ...hd, elec: { ...hd.elec, steps: hd.elec.steps.map(deco) }, water: { ...hd.water, steps: hd.water.steps.map(deco) } };
+  }
+}
+</script>
+</body>
+</html>

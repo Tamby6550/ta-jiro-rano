@@ -1,0 +1,28 @@
+name: Supabase Keep-Alive
+
+# ⚠️ CRITIQUE pour ce projet : le free tier Supabase met le projet en PAUSE
+# après 7 jours d'inactivité. Or l'app est mensuelle (saisie ~1×/mois) → sans
+# ce ping, le projet serait en pause au pire moment. On le réveille tous les
+# 2 jours avec une requête légère filtrée par RLS.
+
+on:
+  schedule:
+    - cron: "0 6 */2 * *"   # tous les 2 jours à 06:00 UTC
+  workflow_dispatch:         # déclenchement manuel possible
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Supabase REST
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" \
+            "$SUPABASE_URL/rest/v1/houses?select=id&limit=1" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY")
+          echo "HTTP $code"
+          # 200 (ok) ou 401/403 (RLS) prouvent que le projet est RÉVEILLÉ.
+          if [ "$code" = "000" ]; then echo "Aucune réponse — échec"; exit 1; fi
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}

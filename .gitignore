@@ -1,0 +1,31 @@
+# Dépendances
+/node_modules
+/.angular/cache
+.npm
+
+# Build
+/dist
+/tmp
+/out-tsc
+
+# Environnements & secrets — NE JAMAIS committer la service_role
+.env
+.env.local
+.env.*.local
+src/environments/environment.local.ts
+
+# Supabase local
+/supabase/.branches
+/supabase/.temp
+**/.supabase
+
+# IDE / OS
+.idea
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*

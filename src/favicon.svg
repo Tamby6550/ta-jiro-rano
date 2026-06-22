@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 38 38">
+  <rect width="38" height="38" rx="10" fill="#0e1626"/>
+  <path d="M5 5h28v14H5z" fill="#f5a524"/>
+  <path d="M5 19h28v14H5z" fill="#0fb5ad"/>
+  <text x="19" y="25" font-family="monospace" font-size="15" font-weight="700" fill="#0e1626" text-anchor="middle">TJ</text>
+</svg>
