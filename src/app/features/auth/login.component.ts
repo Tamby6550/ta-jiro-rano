@@ -4,11 +4,12 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { mapAuthError } from '../../core/auth-errors';
 import { I18nService } from '../../core/i18n.service';
+import { FooterComponent } from '../../shared/footer.component';
 
 @Component({
   selector: 'tjr-login',
   standalone: true,
-  imports: [FormsModule],
+  imports: [FormsModule, FooterComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="wrap">
@@ -49,10 +50,11 @@ import { I18nService } from '../../core/i18n.service';
           {{ mode() === 'signin' ? "Pas de compte ? S'inscrire" : 'Déjà un compte ? Se connecter' }}
         </button>
       </div>
+      <tjr-footer [dark]="true" />
     </div>
   `,
   styles: [`
-    .wrap { min-height:100vh; display:flex; align-items:center; justify-content:center; background:var(--side-bg); padding:24px; }
+    .wrap { min-height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; background:var(--side-bg); padding:24px; }
     .panel { width:380px; max-width:100%; padding:30px; }
     .brand { display:flex; align-items:center; gap:12px; margin-bottom:24px; }
     .bname { font-family:var(--font-display); font-weight:700; font-size:16px; letter-spacing:.06em; color:var(--text-strong); }

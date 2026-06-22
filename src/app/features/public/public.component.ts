@@ -3,6 +3,7 @@ import { SupabaseService } from '../../core/supabase.service';
 import { AriaryPipe, ConsumptionPipe, FDatePipe } from '../../shared/format.pipes';
 import { BarChartComponent, MonthlyPoint } from '../../shared/bar-chart.component';
 import { SpinnerComponent } from '../../shared/spinner.component';
+import { FooterComponent } from '../../shared/footer.component';
 
 interface PRow {
   month: string; month_start: string; utility: 'electricity' | 'water'; due_date: string;
@@ -15,7 +16,7 @@ interface Recap { house_id: string; house: string; tenant: string | null; color:
 @Component({
   selector: 'tjr-public',
   standalone: true,
-  imports: [AriaryPipe, ConsumptionPipe, FDatePipe, BarChartComponent, SpinnerComponent],
+  imports: [AriaryPipe, ConsumptionPipe, FDatePipe, BarChartComponent, SpinnerComponent, FooterComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="wrap">
@@ -93,6 +94,7 @@ interface Recap { house_id: string; house: string; tenant: string | null; color:
 
         <div class="foot muted">Montants en Ariary. Calculs générés automatiquement par TA·JIRO·RANO.</div>
       }
+      <tjr-footer />
     </div>
   `,
   styles: [`
@@ -150,6 +152,18 @@ export class PublicComponent {
     const ms = this.months();
     this.selMonth.set(ms[0] ?? '');
     this.loading.set(false);
+    // Enregistre l'ouverture (dédup par appareil) — sans bloquer l'affichage.
+    void this.sb.client.rpc('log_public_visit', { p_token: token, p_visitor: this.visitorId() });
+  }
+
+  /** Identifiant d'appareil persistant (localStorage). */
+  private visitorId(): string {
+    let id = localStorage.getItem('tjr_visitor');
+    if (!id) {
+      id = (crypto as any)?.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      localStorage.setItem('tjr_visitor', id);
+    }
+    return id;
   }
 
   months = computed<string[]>(() => {

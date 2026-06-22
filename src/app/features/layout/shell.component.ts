@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import { FooterComponent } from '../../shared/footer.component';
 import { AuthService } from '../../core/auth.service';
 import { I18nService, Lang } from '../../core/i18n.service';
 import { PropertyStore } from '../../core/property.store';
@@ -9,7 +10,7 @@ import { SupabaseService } from '../../core/supabase.service';
 @Component({
   selector: 'tjr-shell',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, FormsModule],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, FormsModule, FooterComponent],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="layout">
@@ -49,6 +50,7 @@ import { SupabaseService } from '../../core/supabase.service';
           <div class="divider"></div>
           <a routerLink="/tenant" routerLinkActive="active"><span class="led"></span>{{ t().nav_tenant }} (aperçu)</a>
           @if (auth.isAdmin()) {
+            <a routerLink="/stats" routerLinkActive="active"><span class="led"></span>Consultations</a>
             <a routerLink="/settings" routerLinkActive="active"><span class="led"></span>Paramètres</a>
           }
         </nav>
@@ -90,6 +92,7 @@ import { SupabaseService } from '../../core/supabase.service';
         } @else {
           <router-outlet />
         }
+        <tjr-footer />
       </main>
     </div>
   `,

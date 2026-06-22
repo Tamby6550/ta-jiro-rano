@@ -171,6 +171,18 @@ export class DataService {
     return (data as AllocationRow[]) ?? [];
   }
 
+  // ---- Consultations du lien public ----
+  /** Enregistre une ouverture du lien public (dédup par appareil). */
+  async logVisit(token: string, visitorId: string): Promise<void> {
+    await this.sb.client.rpc('log_public_visit', { p_token: token, p_visitor: visitorId });
+  }
+
+  /** Statistiques de consultation (admin). */
+  async visitStats(): Promise<{ visitor_id: string; ip: string | null; visit_count: number; first_seen: string; last_seen: string }[]> {
+    const { data } = await this.sb.client.rpc('get_visit_stats');
+    return (data as any[]) ?? [];
+  }
+
   // ---- Storage ----
   /** URL signée temporaire pour afficher une photo privée. */
   async signedUrl(bucket: string, path: string, seconds = 3600): Promise<string | null> {

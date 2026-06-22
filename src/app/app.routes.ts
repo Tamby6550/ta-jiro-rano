@@ -56,6 +56,11 @@ export const routes: Routes = [
         loadComponent: () => import('./features/tenant/tenant.component').then((m) => m.TenantComponent),
       },
       {
+        path: 'stats',
+        canActivate: [adminGuard],
+        loadComponent: () => import('./features/stats/stats.component').then((m) => m.StatsComponent),
+      },
+      {
         path: 'settings',
         canActivate: [adminGuard],
         loadComponent: () => import('./features/settings/settings.component').then((m) => m.SettingsComponent),
